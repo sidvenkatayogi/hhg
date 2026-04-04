@@ -104,12 +104,12 @@ export interface HonkOtpResult {
   errorCode: HonkErrorCode | null;
 }
 
-/** Minimum composite match (0–1) to authenticate (~50%). */
-export const HONK_PASS_THRESHOLD = 0.5;
+/** Minimum composite match (0–1) to authenticate (~40%). */
+export const HONK_PASS_THRESHOLD = 0.4;
 
 /** Tier cutoffs: apex ≥ this, then compliant ≥ pass, gosling ≥ probation floor. */
-export const HONK_APEX_THRESHOLD = 0.65;
-export const HONK_GOSLING_THRESHOLD = 0.4;
+export const HONK_APEX_THRESHOLD = 0.55;
+export const HONK_GOSLING_THRESHOLD = 0.3;
 
 // ── Phone Registration (replaces Honkprint) ──
 export interface HonkRegistration {
