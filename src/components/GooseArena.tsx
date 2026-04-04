@@ -44,10 +44,10 @@ export default function GooseArena() {
   return (
     <div className="min-h-screen bg-background noise-bg">
       {/* Header */}
-      <header className="border-b border-white/10 bg-surface/80 backdrop-blur-sm sticky top-0 z-40">
+      <header className="border-b sticky top-0 z-40 backdrop-blur-sm" style={{background: 'rgb(56, 34, 16)', borderColor: 'rgb(56, 34, 16)'}}>
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-xl md:text-2xl font-display text-primary">
-            GOOSE BETS 🪿
+          <h1 className="text-xl md:text-2xl font-display" style={{color: 'rgb(253, 251, 245)'}}>
+            GOOSE BETS <img src="/harnold_.png" style={{height: '36px', display: 'inline', verticalAlign: 'middle'}} alt="" />
           </h1>
           <div className="flex items-center gap-3">
             <HonkTierBadge />
@@ -70,7 +70,6 @@ export default function GooseArena() {
           <h2 className="text-xl md:text-2xl font-bold">
             {round.title}
           </h2>
-          <p className="text-muted">{round.description}</p>
           {isBettingOpen && (
             <p className="text-primary font-bold mt-2">
               What does the goose do next?
@@ -142,8 +141,8 @@ export default function GooseArena() {
           <div className="overflow-hidden">
             <div className="flex animate-marquee whitespace-nowrap">
               {[1, 2].map((k) => (
-                <span key={k} className="text-xs text-muted mx-4">
-                  🪿 HONK HONK HONK — Total Volume Honked: {totalPot.toFixed(2)}{" "}
+                <span key={k} className="text-xs text-muted mx-4 inline-flex items-center gap-2">
+                  <img src="/harnold_.png" style={{height: '14px', display: 'inline'}} alt="" /> HONK HONK HONK — Total Volume Honked: {totalPot.toFixed(2)}{" "}
                   SOL — Bets Placed: {betTotals.length} — Geese
                   Angered: 42 — Honk-in Secured — HONK HONK HONK —{" "}
                 </span>

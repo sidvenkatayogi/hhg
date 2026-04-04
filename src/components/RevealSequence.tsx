@@ -87,7 +87,7 @@ export default function RevealSequence({
       <div className="bg-secondary/20 border-2 border-secondary rounded-xl p-6 glow-gold">
         <div className="text-muted text-sm mb-1">THE GOOSE CHOSE:</div>
         <div className="text-2xl md:text-3xl font-bold text-secondary">
-          {winningLabel}
+          {winningLabel.replace(/^\S+\s/, '')}
         </div>
       </div>
 
@@ -96,7 +96,7 @@ export default function RevealSequence({
         isWinner ? (
           <div className="space-y-3">
             <div className="text-2xl font-display text-success">
-              THE GOOSE GODS SMILE UPON YOU 🪿
+              THE GOOSE GODS SMILE UPON YOU
             </div>
             <div className="text-xl text-success font-bold">
               YOU WON {winnings.toFixed(2)} SOL
@@ -109,7 +109,7 @@ export default function RevealSequence({
                 }}
                 className="bg-success text-background font-bold px-8 py-3 rounded-xl text-lg hover:bg-success/80 transition-colors glow-green"
               >
-                CLAIM WINNINGS 🪿
+                CLAIM WINNINGS
               </button>
             )}
             {claimed && (
@@ -119,7 +119,7 @@ export default function RevealSequence({
         ) : (
           <div className="space-y-2">
             <div className="text-2xl font-display text-danger">
-              REKT BY A GOOSE 🪿
+              REKT BY A GOOSE
             </div>
             <div className="text-muted">tale as old as time.</div>
           </div>

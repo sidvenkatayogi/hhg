@@ -19,12 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=JetBrains+Mono:wght@400;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+      <head />
       <body className="min-h-full flex flex-col bg-background text-foreground font-mono">
         <WalletProvider>
           <HonkAuthProvider>

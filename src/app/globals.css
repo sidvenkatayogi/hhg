@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #0a0a0a;
+  --color-background: rgb(253, 251, 245);
   --color-surface: #1a1a1a;
-  --color-primary: #FF6B00;
+  --color-primary: rgb(228, 171, 85);
   --color-secondary: #FFD700;
   --color-foreground: #FAFAFA;
   --color-muted: #888888;
@@ -11,32 +11,54 @@
   --color-danger: #FF4444;
 }
 
+:root {
+  --cream: rgb(253, 251, 245);
+  --green: rgb(178, 203, 106);
+  --orange: rgb(228, 171, 85);
+  --brown: rgb(56, 34, 16);
+}
+
 @font-face {
-  font-family: 'Luckiest Guy';
+  font-family: 'GoofyPuff';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('https://fonts.gstatic.com/s/luckiestguy/v22/_gP_1RrxsjcxVyin9WbGFof8aJ_SVQ.woff2') format('woff2');
+  src: url('/fonts/Goofy-Puff.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'PlotterxsTRIAL';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/PlotterxsTRIAL-Reg.otf') format('opentype');
 }
 
 body {
-  background: #0a0a0a;
-  color: #FAFAFA;
-  font-family: 'JetBrains Mono', 'Space Mono', ui-monospace, monospace;
+  background: var(--cream);
+  color: var(--brown);
+  font-family: 'PlotterxsTRIAL', sans-serif;
 }
 
 .font-display {
-  font-family: 'Luckiest Guy', cursive;
+  font-family: 'GoofyPuff', cursive;
+}
+
+/* Transparent brown card surfaces */
+.bg-surface {
+  background-color: rgba(56, 34, 16, 0.45) !important;
+  border-color: rgba(56, 34, 16, 0.6) !important;
 }
 
 /* Wallet adapter overrides */
 .wallet-adapter-button {
-  background-color: #FF6B00 !important;
+  background-color: var(--brown) !important;
+  color: white !important;
   border-radius: 0.75rem !important;
-  font-family: 'JetBrains Mono', monospace !important;
+  font-family: 'PlotterxsTRIAL', sans-serif !important;
 }
 .wallet-adapter-button:hover {
-  background-color: #e05e00 !important;
+  background-color: rgb(80, 50, 25) !important;
 }
 .wallet-adapter-modal-wrapper {
   background-color: #1a1a1a !important;
@@ -58,7 +80,7 @@ body {
 
 /* Glow effect */
 .glow-orange {
-  box-shadow: 0 0 20px rgba(255, 107, 0, 0.4), 0 0 40px rgba(255, 107, 0, 0.2);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.4), 0 0 40px rgba(255, 255, 255, 0.2);
 }
 .glow-gold {
   box-shadow: 0 0 20px rgba(255, 215, 0, 0.4), 0 0 40px rgba(255, 215, 0, 0.2);
@@ -78,8 +100,8 @@ body {
 
 /* Pulse glow */
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 0, 0.3); }
-  50% { box-shadow: 0 0 40px rgba(255, 107, 0, 0.6), 0 0 60px rgba(255, 107, 0, 0.3); }
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(255, 255, 255, 0.6), 0 0 60px rgba(255, 255, 255, 0.3); }
 }
 .animate-pulse-glow {
   animation: pulseGlow 2s ease-in-out infinite;
