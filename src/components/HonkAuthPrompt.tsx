@@ -4,14 +4,10 @@ import { useHonkAuth } from "./HonkAuthProvider";
 
 export default function HonkAuthPrompt() {
   const {
-    isRegistered,
     isAuthenticated,
     startAuth,
     authError,
     authAttempts,
-    showRegistration,
-    reRegister,
-    phoneNumber,
   } = useHonkAuth();
 
   if (isAuthenticated) return null;
@@ -21,14 +17,10 @@ export default function HonkAuthPrompt() {
       <div className="text-center space-y-2">
         <div className="text-4xl">🪿</div>
         <h3 className="text-xl font-display text-primary">
-          {isRegistered
-            ? "HONK-OTP VERIFICATION"
-            : "HONK-OTP REGISTRATION REQUIRED"}
+          HONK VERIFICATION REQUIRED
         </h3>
         <p className="honk-on-surface-muted text-sm">
-          {isRegistered
-            ? `Phone ${phoneNumber} on file. Start Honk verification—the Seed Honk plays in this browser (no real call).`
-            : "No phone on file. Register a contact number to continue (prototype: stored locally only)."}
+          Authenticate your goose vocalization to place bets. The Seed Honk plays in this browser — honk it back into your microphone.
         </p>
       </div>
 
@@ -52,31 +44,12 @@ export default function HonkAuthPrompt() {
         </div>
       )}
 
-      <div className="flex gap-3">
-        {isRegistered ? (
-          <>
-            <button
-              onClick={reRegister}
-              className="flex-1 py-3 rounded-lg border border-white/25 honk-on-surface-muted hover:bg-white/10 transition-colors text-sm"
-            >
-              Change Phone
-            </button>
-            <button
-              onClick={startAuth}
-              className="flex-1 py-3 rounded-lg bg-primary text-white font-bold hover:bg-primary/80 transition-colors animate-pulse-glow"
-            >
-              START HONK VERIFICATION
-            </button>
-          </>
-        ) : (
-          <button
-            onClick={showRegistration}
-            className="w-full py-3 rounded-lg bg-primary text-white font-bold hover:bg-primary/80 transition-colors animate-pulse-glow"
-          >
-            REGISTER PHONE
-          </button>
-        )}
-      </div>
+      <button
+        onClick={startAuth}
+        className="w-full py-3 rounded-lg bg-primary text-white font-bold hover:bg-primary/80 transition-colors animate-pulse-glow"
+      >
+        START HONK VERIFICATION
+      </button>
     </div>
   );
 }

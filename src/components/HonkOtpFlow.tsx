@@ -1,15 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { useHonkAuth } from "./HonkAuthProvider";
 import { HONK_PASS_THRESHOLD } from "@/lib/honk-types";
 import VFormationAnimation from "./VFormationAnimation";
 
 export default function HonkOtpFlow() {
-  const { otpState, cancelAuth, cancelRegistration, registerPhone } =
-    useHonkAuth();
-
-  const [phoneInput, setPhoneInput] = useState("");
+  const { otpState, cancelAuth } = useHonkAuth();
 
   const { step, error, matchScore } = otpState;
 
@@ -19,59 +15,7 @@ export default function HonkOtpFlow() {
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm">
       <div className="honk-on-surface bg-surface border-2 border-primary rounded-2xl p-8 max-w-lg w-full mx-4 space-y-6">
-        {/* ── Phone Entry ── */}
-        {step === "phone-entry" && (
-          <>
-            <div className="text-center">
-              <h2 className="text-2xl font-display text-primary">
-                HONK-OTP REGISTRATION
-              </h2>
-              <p className="honk-on-surface-muted text-sm mt-2">
-                Save a contact number for your Honk-OTP profile. In this
-                prototype, the Seed Honk always plays in this browser—no real
-                outbound call is placed.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <label className="block text-sm honk-on-surface-muted">Phone Number</label>
-              <input
-                type="tel"
-                value={phoneInput}
-                onChange={(e) => setPhoneInput(e.target.value)}
-                placeholder="+1 (555) 867-5309"
-                className="w-full bg-black/40 border border-white/25 rounded-lg px-4 py-3 text-[#fdfbf5] placeholder:text-[rgba(253,251,245,0.45)] focus:border-primary focus:outline-none transition-colors"
-              />
-              <p className="text-xs honk-on-surface-subtle">
-                Stored on this device only. Real voice/SMS delivery can be wired
-                in later; for now it is account metadata.
-              </p>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={cancelRegistration}
-                className="flex-1 py-3 rounded-lg border border-white/25 honk-on-surface-muted hover:bg-white/10 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  if (phoneInput.trim().length >= 7) {
-                    registerPhone(phoneInput.trim());
-                    setPhoneInput("");
-                  }
-                }}
-                disabled={phoneInput.trim().length < 7}
-                className="flex-1 py-3 rounded-lg bg-primary text-white font-bold hover:bg-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                REGISTER PHONE
-              </button>
-            </div>
-          </>
-        )}
-
-        {/* ── Calling (prototype: fetch challenge, no PSTN) ── */}
+        {/* ── Calling (fetch challenge) ── */}
         {step === "calling" && (
           <div className="text-center space-y-6">
             <h2 className="text-2xl font-display text-primary">
@@ -94,8 +38,7 @@ export default function HonkOtpFlow() {
               Fetching your challenge from the server...
             </p>
             <p className="text-xs honk-on-surface-subtle">
-              Audio will play through this device&apos;s speakers next—not over
-              the phone network.
+              Audio will play through this device&apos;s speakers — listen carefully.
             </p>
           </div>
         )}
@@ -104,7 +47,7 @@ export default function HonkOtpFlow() {
         {step === "playing-seed" && (
           <div className="text-center space-y-6">
             <h2 className="text-2xl font-display text-primary">
-              SEED HONK (THIS DEVICE)
+              SEED HONK PLAYING
             </h2>
             <div className="flex justify-center">
               <div className="w-24 h-24 rounded-full border-4 border-secondary bg-secondary/20 flex items-center justify-center seed-honk-pulse">
@@ -136,8 +79,7 @@ export default function HonkOtpFlow() {
               SEED HONK PLAYING...
             </p>
             <p className="text-xs honk-on-surface-muted">
-              Listen on this computer—you will re-capture a similar honk through
-              the microphone in the next step.
+              Listen carefully — you will honk it back through the microphone next.
             </p>
           </div>
         )}
@@ -146,7 +88,7 @@ export default function HonkOtpFlow() {
         {step === "listening" && (
           <div className="text-center space-y-6">
             <h2 className="text-2xl font-display text-primary">
-              RE-TRANSMIT INTO MICROPHONE
+              HONK INTO MICROPHONE
             </h2>
             <div className="flex justify-center">
               <div className="w-24 h-24 rounded-full border-4 border-primary bg-primary/20 flex items-center justify-center animate-honk-pulse">
@@ -162,17 +104,15 @@ export default function HonkOtpFlow() {
               </div>
             </div>
             <p className="text-primary font-bold">
-              Play back the honk you just heard (e.g. from another phone or
-              speaker held near this mic), or produce a matching honk.
+              Reproduce the Seed Honk into your microphone, or play it back from a speaker held near the mic.
             </p>
             <p className="text-xs honk-on-surface-muted">
-              The protocol compares your microphone capture to the Seed Honk
-              that played here—not to a cellular call.
+              The protocol compares your microphone capture to the Seed Honk.
             </p>
           </div>
         )}
 
-        {/* ── Verifying ─��� */}
+        {/* ── Verifying ── */}
         {step === "verifying" && (
           <div className="text-center space-y-6">
             <h2 className="text-2xl font-display text-primary">
@@ -284,4 +224,3 @@ function VerifyBar({ label, delay }: { label: string; delay: number }) {
     </div>
   );
 }
-

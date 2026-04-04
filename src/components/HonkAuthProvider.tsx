@@ -23,7 +23,6 @@ import {
   captureHonk,
   saveRegistration,
   loadRegistration,
-  deleteRegistration,
 } from "@/lib/honk-capture";
 import { getAudioContext } from "@/lib/audio-context";
 import {
@@ -39,24 +38,17 @@ import { useHonkVerificationSiteMute } from "@/hooks/useHonkVerificationSiteMute
 
 interface HonkAuthContextValue {
   session: HonkSession | null;
-  isRegistered: boolean;
   isAuthenticated: boolean;
   tier: HonkTier | null;
-  phoneNumber: string | null;
 
   otpState: HonkOtpState;
   startAuth: () => Promise<void>;
   cancelAuth: () => void;
 
-  showRegistration: () => void;
-  registerPhone: (phone: string) => void;
-  cancelRegistration: () => void;
-
   authError: HonkError | null;
   authAttempts: number;
 
   clearSession: () => void;
-  reRegister: () => void;
 }
 
 const HonkAuthContext = createContext<HonkAuthContextValue | null>(null);
@@ -72,7 +64,6 @@ export function useHonkAuth(): HonkAuthContextValue {
 const INITIAL_OTP_STATE: HonkOtpState = {
   step: "idle",
   seedHonkParams: null,
-  phoneNumber: "",
   error: null,
   matchScore: null,
 };
@@ -91,9 +82,6 @@ export default function HonkAuthProvider({
   const [authAttempts, setAuthAttempts] = useState(0);
   const authStartTimeRef = useRef<number>(0);
 
-  const registration = pubkey ? loadRegistration(pubkey) : null;
-  const isRegistered = registration !== null;
-  const phoneNumber = registration?.phoneNumber ?? null;
   const isAuthenticated = session !== null && session.pubkey === pubkey;
   const tier = session?.tier ?? null;
 
@@ -108,30 +96,13 @@ export default function HonkAuthProvider({
     }
   }, [pubkey]);
 
-  const showRegistration = useCallback(() => {
-    setOtpState((prev) => ({ ...prev, step: "phone-entry", error: null }));
-  }, []);
-
-  const registerPhone = useCallback(
-    (phone: string) => {
-      if (!pubkey) return;
-      saveRegistration(pubkey, phone);
-      setOtpState((prev) => ({
-        ...prev,
-        step: "idle",
-        phoneNumber: phone,
-        error: null,
-      }));
-    },
-    [pubkey]
-  );
-
-  const cancelRegistration = useCallback(() => {
-    setOtpState(INITIAL_OTP_STATE);
-  }, []);
-
   const startAuth = useCallback(async () => {
     if (!pubkey) return;
+
+    // Auto-register wallet if not already registered
+    if (!loadRegistration(pubkey)) {
+      saveRegistration(pubkey);
+    }
 
     authStartTimeRef.current = Date.now();
 
@@ -279,34 +250,18 @@ export default function HonkAuthProvider({
     setOtpState(INITIAL_OTP_STATE);
   }, []);
 
-  const reRegister = useCallback(() => {
-    if (pubkey) {
-      deleteRegistration(pubkey);
-    }
-    setSession(null);
-    setAuthError(null);
-    setAuthAttempts(0);
-    setOtpState({ ...INITIAL_OTP_STATE, step: "phone-entry" });
-  }, [pubkey]);
-
   return (
     <HonkAuthContext.Provider
       value={{
         session,
-        isRegistered,
         isAuthenticated,
         tier,
-        phoneNumber,
         otpState,
         startAuth,
         cancelAuth,
-        showRegistration,
-        registerPhone,
-        cancelRegistration,
         authError,
         authAttempts,
         clearSession,
-        reRegister,
       }}
     >
       {children}

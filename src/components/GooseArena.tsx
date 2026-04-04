@@ -16,7 +16,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 
 export default function GooseArena() {
   const { state } = useGameState();
-  const { getUserBet, getUserWager } = useBetting();
+  const { getUserBet, getUserWager, recordUserBet } = useBetting();
   const { isAuthenticated, tier } = useHonkAuth();
   const { publicKey } = useWallet();
 
@@ -122,6 +122,7 @@ export default function GooseArena() {
             userBet={userBet}
             totalPot={totalPot}
             honkLocked={isBettingOpen && !canBet && !!publicKey}
+            onBetPlaced={recordUserBet}
           />
         )}
 

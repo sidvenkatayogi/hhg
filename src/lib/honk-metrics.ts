@@ -1,4 +1,4 @@
-// ── Honk-OTP KPI Tracking ──
+// ── Honk Verification KPI Tracking ──
 // Time-to-Honk (TTH) and False Honk Rate (FHR), stored in localStorage.
 
 const METRICS_KEY = "honk_otp_metrics";

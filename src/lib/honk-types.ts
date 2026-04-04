@@ -1,4 +1,4 @@
-// ── Honk-OTP 2FA — Types ──
+// ── Honk Verification 2FA — Types ──
 
 export type HonkTier = "apex" | "compliant" | "gosling" | "locked";
 
@@ -12,7 +12,7 @@ export type HonkErrorCode =
   | "HNK-007" // Excessive Honk
   | "HNK-008" // Formant Drift
   | "HNK-009" // Competitive Honking
-  | "HNK-010" // Silent Gander (phone on mute)
+  | "HNK-010" // Silent Gander (no audio detected)
   | "HNK-011" // Mallard Interference
   | "HNK-012" // Human Impersonation (mouth-honk)
   | "HNK-013" // Hissing Lockout (legacy; lockout disabled in app)
@@ -69,10 +69,9 @@ export interface HonkChallengeResponse {
   seedAudioSampleRate?: number;
 }
 
-// ── OTP Flow State ──
+// ── Honk Verification Flow State ──
 export type HonkOtpStep =
   | "idle"
-  | "phone-entry"
   | "calling"
   | "playing-seed"
   | "listening"
@@ -95,12 +94,11 @@ export function isHonkVerificationSiteMuteStep(step: HonkOtpStep): boolean {
 export interface HonkOtpState {
   step: HonkOtpStep;
   seedHonkParams: SeedHonkParams | null;
-  phoneNumber: string;
   error: HonkError | null;
   matchScore: number | null;
 }
 
-// ── OTP Verification Result ──
+// ── Honk Verification Result ──
 export interface HonkOtpResult {
   matched: boolean;
   matchScore: number;
@@ -123,9 +121,8 @@ export const HONK_PASS_THRESHOLD = 0.4;
 export const HONK_APEX_THRESHOLD = 0.55;
 export const HONK_GOSLING_THRESHOLD = 0.3;
 
-// ── Phone Registration (replaces Honkprint) ──
+// ── Wallet Registration ──
 export interface HonkRegistration {
-  phoneNumber: string;
   registeredAt: number;
   pubkey: string;
 }
@@ -186,7 +183,7 @@ export const HONK_ERRORS: Record<HonkErrorCode, Omit<HonkError, "code">> = {
   },
   "HNK-010": {
     label: "Silent Gander",
-    message: "No audio detected. Is your phone on mute? The goose waits for no one.",
+    message: "No audio detected. Is your microphone on mute? The goose waits for no one.",
     severity: "error",
   },
   "HNK-011": {

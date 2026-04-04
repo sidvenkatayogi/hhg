@@ -1,4 +1,4 @@
-// ── Honk-OTP Verification: Compare captured audio against Seed Honk reference ──
+// ── Honk Verification: Compare captured audio against Seed Honk reference ──
 // Composite score = 0.40×frequency + 0.25×amplitude + 0.35×aggression
 // Includes anti-impersonation detection for mouth-honks and mallard interference.
 

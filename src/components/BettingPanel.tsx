@@ -29,6 +29,7 @@ interface BettingPanelProps {
   userBet: number | null;
   totalPot: number;
   honkLocked?: boolean;
+  onBetPlaced?: (roundId: string, option: number, amount: number) => void;
 }
 
 const OPTION_COLORS = [
@@ -46,6 +47,7 @@ export default function BettingPanel({
   userBet,
   totalPot,
   honkLocked = false,
+  onBetPlaced,
 }: BettingPanelProps) {
   const { publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
@@ -79,6 +81,9 @@ export default function BettingPanel({
       // Record the bet server-side
       await recordBet(publicKey.toBase58(), roundId, selectedOption, amount);
 
+      // Update local betting state so the UI reflects the bet
+      onBetPlaced?.(roundId, selectedOption, amount);
+
       setHonkFlash(true);
       setTimeout(() => setHonkFlash(false), 1500);
     } catch (err) {
@@ -86,7 +91,7 @@ export default function BettingPanel({
     } finally {
       setPlacing(false);
     }
-  }, [publicKey, selectedOption, wager, placing, hasBet, roundId, sendTransaction, connection]);
+  }, [publicKey, selectedOption, wager, placing, hasBet, roundId, sendTransaction, connection, onBetPlaced]);
 
   // Calculate percentages and implied odds
   const percentages = options.map((_, i) =>

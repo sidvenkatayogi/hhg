@@ -3,7 +3,7 @@ import { HONK_PASS_THRESHOLD } from "@/lib/honk-types";
 
 export const dynamic = "force-dynamic";
 
-// Honk-OTP verification endpoint.
+// Honk verification endpoint.
 // The client performs DSP comparison locally and submits the result for
 // server-side audit logging and validation.
 
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Insufficient Honk-OTP match score. Waterfowl Handshake Protocol denied.",
+          "Insufficient Honk match score. Waterfowl Handshake Protocol denied.",
       },
       { status: 401 }
     );

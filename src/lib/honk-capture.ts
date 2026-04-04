@@ -1,6 +1,6 @@
-// ── Honk-OTP Capture: Microphone access, real-time honk detection ──
-// Reused from the original Honk-in system — captures a single honk from
-// the microphone for comparison against the Seed Honk reference signal.
+// ── Honk Capture: Microphone access, real-time honk detection ──
+// Captures a single honk from the microphone for comparison against
+// the Seed Honk reference signal.
 
 import { getAudioContext } from "./audio-context";
 import {
@@ -26,7 +26,7 @@ const ANALYSIS_WINDOW_SIZE = 2048;
 
 export interface CaptureResult {
   analysis: HonkAnalysis;
-  rawSignal: Float32Array; // Full captured signal for OTP verification
+  rawSignal: Float32Array; // Full captured signal for honk verification
   rawPeakDbfs: number;
 }
 
@@ -195,15 +195,14 @@ function makeAnalysisError(code: HonkErrorCode): HonkAnalysis {
   };
 }
 
-// ── Phone Registration Persistence (localStorage) ──
+// ── Wallet Registration Persistence (localStorage) ──
 
 const LEGACY_LOCKOUT_KEY_PREFIX = "honk_lockout_";
 
 const REGISTRATION_KEY_PREFIX = "honk_registration_";
 
-export function saveRegistration(pubkey: string, phoneNumber: string): void {
+export function saveRegistration(pubkey: string): void {
   const registration: HonkRegistration = {
-    phoneNumber,
     registeredAt: Date.now(),
     pubkey,
   };

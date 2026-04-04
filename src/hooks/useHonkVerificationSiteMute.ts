@@ -3,8 +3,10 @@
 import { useEffect } from "react";
 
 /**
- * While active, mutes every video/audio in the document so Honk-OTP capture
- * and seed playback are not masked by site media (e.g. arena clips).
+ * While active, mutes every video/audio in the document so honk verification
+ * capture and seed playback are not masked by site media (e.g. arena clips).
+ * Uses both a MutationObserver (for new elements) and a polling interval
+ * (to catch programmatic unmutes via JS properties).
  */
 export function useHonkVerificationSiteMute(active: boolean): void {
   useEffect(() => {
@@ -24,11 +26,17 @@ export function useHonkVerificationSiteMute(active: boolean): void {
     };
 
     captureAndMute();
+
+    // Catch newly added media elements
     const observer = new MutationObserver(captureAndMute);
     observer.observe(document.body, { childList: true, subtree: true });
 
+    // Catch programmatic unmutes (el.muted = false) which don't trigger MutationObserver
+    const interval = setInterval(captureAndMute, 200);
+
     return () => {
       observer.disconnect();
+      clearInterval(interval);
       snapshots.forEach((snap, el) => {
         if (el.isConnected) {
           el.volume = snap.volume;
