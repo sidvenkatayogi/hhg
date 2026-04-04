@@ -191,3 +191,82 @@ body {
 .animate-waveform-delay-3 {
   animation: waveform 0.6s ease-in-out 0.3s infinite;
 }
+
+/* ── Honk-OTP Styles ── */
+
+/* V-formation animation */
+@keyframes vFormation {
+  0% {
+    transform: translate(0, 80px) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  60% {
+    transform: translate(var(--end-x), var(--end-y)) rotate(-10deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--end-x), calc(var(--end-y) - 120px)) rotate(-10deg);
+    opacity: 0;
+  }
+}
+.v-formation-goose {
+  animation: vFormation 2.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  opacity: 0;
+}
+
+@keyframes vFormationText {
+  0% { opacity: 0; transform: translateY(10px); }
+  40% { opacity: 0; }
+  70% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.v-formation-text {
+  animation: vFormationText 2s ease-out forwards;
+}
+
+/* Seed honk speaker pulse */
+@keyframes seedHonkPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 25px rgba(255, 215, 0, 0);
+  }
+}
+.seed-honk-pulse {
+  animation: seedHonkPulse 0.8s ease-in-out infinite;
+}
+
+/* Seed honk waveform bars */
+@keyframes seedBar {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+.seed-honk-bar {
+  animation: seedBar 0.5s ease-in-out infinite;
+  transform-origin: bottom;
+}
+
+/* Verify progress bar animation */
+@keyframes verifyFill {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+.verify-bar {
+  animation: verifyFill 0.6s ease-out forwards;
+  width: 0%;
+}
+
+/* Verify check animation */
+@keyframes verifyCheck {
+  0% { content: '...'; }
+  100% { content: ''; }
+}
+.verify-check {
+  animation: verifyFill 0.6s ease-out forwards;
+}

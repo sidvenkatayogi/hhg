@@ -1,24 +1,33 @@
 import { NextResponse } from "next/server";
+import { HONK_PASS_THRESHOLD } from "@/lib/honk-types";
 
 export const dynamic = "force-dynamic";
 
-// Honk verification is primarily client-side (DSP pipeline runs in browser).
-// This endpoint validates that the client completed the challenge flow and
-// records the authentication event. In a production system, the server would
-// verify a wallet-signed (nonce + honkprint) payload using ed25519.
+// Honk-OTP verification endpoint.
+// The client performs DSP comparison locally and submits the result for
+// server-side audit logging and validation.
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { pubkey, honkprintDigest, tier, similarity, nonce } = body;
+  const {
+    pubkey,
+    seedHonkId,
+    matchScore,
+    frequencyMatch,
+    amplitudeMatch,
+    aggressionMatch,
+    tier,
+    antiImpersonation,
+  } = body;
 
-  if (!pubkey || !honkprintDigest || !tier) {
+  if (!pubkey || !seedHonkId || typeof matchScore !== "number" || !tier) {
     return NextResponse.json(
-      { error: "Missing required fields: pubkey, honkprintDigest, tier" },
+      { error: "Missing required fields: pubkey, seedHonkId, matchScore, tier" },
       { status: 400 }
     );
   }
 
-  // Validate tier is a recognized value
+  // Validate tier
   const validTiers = ["apex", "compliant", "gosling"];
   if (!validTiers.includes(tier)) {
     return NextResponse.json(
@@ -27,30 +36,42 @@ export async function POST(request: Request) {
     );
   }
 
-  // Validate similarity threshold
-  if (typeof similarity === "number" && similarity < 0.70) {
+  // Validate match threshold
+  if (matchScore < HONK_PASS_THRESHOLD) {
     return NextResponse.json(
-      { error: "Insufficient honkprint similarity. Authentication denied." },
+      {
+        error:
+          "Insufficient Honk-OTP match score. Waterfowl Handshake Protocol denied.",
+      },
       { status: 401 }
     );
   }
 
-  // In a full implementation, we would:
-  // 1. consumeNonce(pubkey, nonce) — verify the challenge was fresh
-  // 2. Verify a wallet signature over (nonce + honkprintDigest) using ed25519
-  // 3. Issue a JWT scoped to (pubkey, roundId)
-  //
-  // For Goose Bets, auth state lives client-side. This endpoint
-  // serves as an audit log and validation checkpoint.
+  // Check anti-impersonation flags
+  if (antiImpersonation?.isHumanMouth || antiImpersonation?.isMallard) {
+    return NextResponse.json(
+      {
+        error: antiImpersonation.isHumanMouth
+          ? "Human impersonation detected. You are not a goose."
+          : "Mallard interference detected. Canada Goose protocol only.",
+      },
+      { status: 403 }
+    );
+  }
 
   return NextResponse.json({
     success: true,
     pubkey,
     tier,
+    seedHonkId,
+    matchScore,
+    frequencyMatch,
+    amplitudeMatch,
+    aggressionMatch,
     authenticatedAt: Date.now(),
     message:
       tier === "apex"
-        ? "DOMINANT GANDER authenticated. Full access granted."
+        ? "DOMINANT GANDER authenticated. Full access granted. V-formation initiated."
         : tier === "compliant"
         ? "Standard Goose authenticated. Access granted."
         : "Gosling (Probationary) authenticated. Limited access.",

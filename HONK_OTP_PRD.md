@@ -208,7 +208,7 @@ A recording of an authorized goose honk played back through a speaker exhibits:
 
 **Target:** < 15 seconds (includes 1.5s call ringing animation + 3s seed honk playback + 5s user positioning + 3s capture + 2s verification)
 
-**Tracking:** Store `{ startTime, endTime, durationMs }` for each successful auth. Maintain rolling average of last 10 attempts in localStorage.
+**Tracking:** Each completed attempt records `{ timestamp, durationMs, success, matchScore, tier, errorCode, flaggedAsReplay, flaggedAsImpersonation }`. The client keeps the **50 most recent** attempts in `localStorage` under `honk_otp_metrics` (see §11).
 
 **KPI Display:** Dev console: `getHonkKPIs()` → `{ ttH_avg: 12.3, tth_min: 8.1, tth_max: 18.9 }`
 
@@ -299,7 +299,129 @@ A recording of an authorized goose honk played back through a speaker exhibits:
 
 ---
 
-**Document Version:** 1.0  
-**Status:** Ready for Implementation  
+**Document Version:** 1.2  
+**Status:** Prototype complete (TypeScript + `next build` green as of 2026-04-04)  
 **Approved by:** Chief Security Architect, Anser-Auth  
 **Date:** 2026-04-04
+
+---
+
+## 9. Implementation Status
+
+### Completed ✅
+
+| File | Status | Notes |
+|------|--------|-------|
+| `src/lib/honk-types.ts` | ✅ Done | `SeedHonkParams`, `HonkOtpState`, `HonkOtpResult`, `HonkLockoutState`, `HonkRegistration`, `HonkOtpStep`. Error codes HNK-010–HNK-015 (incl. Seed Honk Expired). |
+| `src/lib/seed-honk.ts` | ✅ Done | `generateSeedHonkParams()`, `synthesizeSeedHonk()`, `renderSeedHonkReference()`. Sawtooth + FM vibrato + waveshaper + bandpass. `WaveShaperNode.curve` casts satisfy strict `Float32Array<ArrayBuffer>` typing (live + offline graphs). |
+| `src/lib/honk-otp-verify.ts` | ✅ Done | `verifyHonkOtp()`, frequency/amplitude/aggression matchers, `detectHumanMouthHonk()`, `detectMallardQuack()`, `spectralFlatness()` for HNK-014. |
+| `src/lib/honk-metrics.ts` | ✅ Done | `recordAuthAttempt()`, `getHonkKPIs()`; up to 50 attempts in `honk_otp_metrics`. |
+| `src/lib/honk-capture.ts` | ✅ Done | `captureHonk()` → `rawSignal: Float32Array`. Lockout + registration persistence. Capture timeout → HNK-010. |
+| `src/lib/honk-dsp.ts` | ✅ Done | Shared DSP helpers (pitch, MFCC, etc.) used by capture and verification. |
+| `src/app/api/honk-auth/challenge/route.ts` | ✅ Done | GET returns `seedHonk` + `expiresAt`. In-memory challenge map keyed by `pubkey`; exports `consumeChallenge()` for future binding to verify. |
+| `src/app/api/honk-auth/verify/route.ts` | ✅ Done | POST validates `matchScore` ≥ 0.95, tier ∈ {apex, compliant, gosling}, rejects human/mallard flags. Best-effort audit from client after local DSP success. |
+| `src/components/HonkAuthProvider.tsx` | ✅ Done | OTP state machine, lockout countdown, registration, `startAuth()` orchestration, KPI recording. |
+| `src/components/VFormationAnimation.tsx` | ✅ Done | CSS V-formation + canvas-confetti (gold/orange). |
+| `src/components/HonkOtpFlow.tsx` | ✅ Done | Modal flow: phone → calling → seed → listening → verifying → success/error. |
+| `src/components/HonkAuthPrompt.tsx` | ✅ Done | REGISTER / INITIATE GOOSE CALL / lockout copy; uses `isRegistered` from provider. |
+| `src/components/GooseArena.tsx` | ✅ Done | Renders `HonkAuthPrompt` when wallet connected and not honk-authenticated (`needsHonkAuth`). Registration gating lives in provider + prompt, not the arena flag. |
+| `src/components/HonkEnrollment.tsx` | ✅ Removed | Replaced by `HonkOtpFlow.tsx`. |
+| `src/app/layout.tsx` | ✅ Done | Mounts `HonkOtpFlow` via provider stack. |
+| `src/app/globals.css` | ✅ Done | V-formation, seed pulse, verify progress animations. |
+
+### Optional / backlog ⏳
+
+| Item | Notes |
+|------|-------|
+| `POST /api/honk-auth/register` | Not implemented; phone “registration” is client-only (`honk_registration_{pubkey}`). Add when a real backend or SMS flow exists. |
+| Bind `consumeChallenge()` in verify | Challenge route defines one-time `consumeChallenge(pubkey, seedHonkId)` but verify does not call it yet—prototype trusts the client-reported scores after a successful local match. Production should require a consumed, unexpired challenge server-side. |
+| `src/lib/api.ts` honk helpers | `fetchHonkChallenge` / `verifyHonkAuth` still describe the **legacy** nonce/honkprint API; unused by the OTP UI. Remove or realign when consolidating HTTP clients. |
+| Replay detection (HNK-006) | PRD describes heuristics; confirm parity with `honk-otp-verify.ts` and whether failed replay should increment lockout. |
+
+---
+
+## 10. HTTP API (Prototype)
+
+### `GET /api/honk-auth/challenge?pubkey=<wallet_pubkey>`
+
+**Response 200**
+
+```json
+{
+  "seedHonk": { "id": "…", "fundamentalHz": 240, "harmonics": […], "amplitudeEnvelope": { … }, "durationMs": 600, "frequencyModulation": { … }, "aggressionCoefficient": 0.4, "createdAt": 0, "expiresAt": 0 },
+  "expiresAt": 1712345678901
+}
+```
+
+**Errors:** `400` if `pubkey` missing.
+
+**Behavior:** Stores one challenge per pubkey in memory until consumed or expired (server restart clears the map).
+
+### `POST /api/honk-auth/verify`
+
+**Body (JSON)**
+
+| Field | Type | Required | Notes |
+|--------|------|----------|--------|
+| `pubkey` | string | ✓ | Wallet public key |
+| `seedHonkId` | string | ✓ | Must match issued challenge in a hardened deployment |
+| `matchScore` | number | ✓ | Must be ≥ `0.95` |
+| `frequencyMatch` | number | | Echoed in response |
+| `amplitudeMatch` | number | | Echoed in response |
+| `aggressionMatch` | number | | Echoed in response |
+| `tier` | string | ✓ | `apex` \| `compliant` \| `gosling` |
+| `antiImpersonation` | object | | If `isHumanMouth` or `isMallard` → `403` |
+
+**Response 200:** `{ success, pubkey, tier, seedHonkId, matchScore, …, authenticatedAt, message }`
+
+**Errors:** `400` missing fields; `401` score below threshold; `403` invalid tier or impersonation flags.
+
+**Note:** The UI calls this **after** local verification succeeds; failures do not hit this route today.
+
+---
+
+## 11. Client persistence (`localStorage`)
+
+| Key pattern | Purpose |
+|-------------|---------|
+| `honk_otp_metrics` | Rolling list (max 50) of auth attempts for KPIs |
+| `honk_lockout_{pubkey}` | `{ failureCount, lastFailureAt, lockedUntil }` |
+| `honk_registration_{pubkey}` | `{ phoneNumber, registeredAt, pubkey }` |
+
+Session state (tier, `authenticatedAt`, `seedHonkId`) is held in React context after a successful match; it is not persisted to `localStorage` in the prototype.
+
+---
+
+## 12. UX ↔ state machine (reference)
+
+High-level steps driven by `HonkAuthProvider` + `HonkOtpFlow`:
+
+1. **idle** → user opens flow; may require **phone-entry** if not registered.  
+2. **calling** → simulated ring; then **playing-seed** (synthesized seed honk).  
+3. **listening** → `captureHonk()` (mic).  
+4. **verifying** → `verifyHonkOtp()` against offline-rendered reference + anti-impersonation checks.  
+5. **success** → session + optional `POST /verify`; **error** → mapped `HonkError` (incl. HNK-013 lockout).
+
+HNK-010 and HNK-014 do not advance the lockout failure counter (see provider).
+
+---
+
+## 13. Manual QA checklist
+
+- [ ] Connect wallet → prompt appears when not authenticated.  
+- [ ] Register phone (stored per pubkey) → “initiate call” enabled.  
+- [ ] Full happy path: seed plays → honk captured → score ≥ 0.95 → V-formation + confetti.  
+- [ ] Silent timeout (no audio) → HNK-010, no lockout strike.  
+- [ ] Three substantive failures → HNK-013, 24h countdown, auth blocked until expiry.  
+- [ ] DevTools: `getHonkKPIs()` reflects attempts after several tries.  
+- [ ] Lockout clears on success path (`clearLockout`) and when 24h elapses (`isLockedOut` clears expired state).
+
+---
+
+## 14. Document history
+
+| Version | Date | Summary |
+|---------|------|---------|
+| 1.0 | — | Initial PRD: journey, DSP spec, edge cases, KPIs, disclaimer. |
+| 1.1 | 2026-04-04 | Implementation status appendix; OTP codebase mapped. |
+| 1.2 | 2026-04-04 | Closed open “next session” items; added API, persistence, QA, backlog; build verified. |

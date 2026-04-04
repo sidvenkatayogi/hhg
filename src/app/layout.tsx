@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import WalletProvider from "@/components/WalletProvider";
 import HonkAuthProvider from "@/components/HonkAuthProvider";
-import HonkEnrollment from "@/components/HonkEnrollment";
+import HonkOtpFlow from "@/components/HonkOtpFlow";
 
 export const metadata: Metadata = {
   title: "GOOSE BETS — Degenerate Waterfowl Gambling",
@@ -24,7 +24,7 @@ export default function RootLayout({
         <WalletProvider>
           <HonkAuthProvider>
             {children}
-            <HonkEnrollment />
+            <HonkOtpFlow />
           </HonkAuthProvider>
         </WalletProvider>
       </body>

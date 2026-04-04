@@ -1,17 +1,21 @@
 import { NextResponse } from "next/server";
+import { generateSeedHonkPcm } from "@/lib/elevenlabs-seed-honk";
+import { generateSeedHonkParams } from "@/lib/seed-honk";
+import type { HonkChallengeResponse, SeedHonkParams } from "@/lib/honk-types";
 
 export const dynamic = "force-dynamic";
 
-// In-memory nonce store — sufficient for Vercel serverless per-instance lifetime.
-// In production you'd use a KV store, but for Goose Bets this is fine.
-const nonceStore = new Map<string, { nonce: string; expiresAt: number }>();
+// In-memory store for seed honk challenges, keyed by pubkey.
+const challengeStore = new Map<
+  string,
+  { params: SeedHonkParams; expiresAt: number }
+>();
 
-// Cleanup expired nonces periodically
-function cleanupNonces() {
+function cleanupExpired() {
   const now = Date.now();
-  for (const [key, value] of nonceStore) {
+  for (const [key, value] of challengeStore) {
     if (value.expiresAt < now) {
-      nonceStore.delete(key);
+      challengeStore.delete(key);
     }
   }
 }
@@ -27,31 +31,47 @@ export async function GET(request: Request) {
     );
   }
 
-  cleanupNonces();
+  cleanupExpired();
 
-  // Generate a cryptographically random nonce
-  const nonceBytes = new Uint8Array(32);
-  crypto.getRandomValues(nonceBytes);
-  const nonce = Array.from(nonceBytes)
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+  const params = generateSeedHonkParams();
 
-  const expiresAt = Date.now() + 60_000; // 60 second expiry
+  challengeStore.set(pubkey, {
+    params,
+    expiresAt: params.expiresAt,
+  });
 
-  nonceStore.set(pubkey, { nonce, expiresAt });
+  const body: HonkChallengeResponse = {
+    seedHonk: params,
+    expiresAt: params.expiresAt,
+  };
 
-  return NextResponse.json({ nonce, expiresAt });
+  const apiKey = process.env.ELEVENLABS_API_KEY;
+  const voiceId = process.env.ELEVENLABS_VOICE_ID;
+  if (apiKey && voiceId) {
+    try {
+      const pcm = await generateSeedHonkPcm(params, voiceId, apiKey);
+      body.seedAudioPcmBase64 = Buffer.from(pcm).toString("base64");
+      body.seedAudioSampleRate = 44100;
+    } catch (e) {
+      console.error("[honk-auth/challenge] ElevenLabs TTS failed:", e);
+    }
+  }
+
+  return NextResponse.json(body);
 }
 
-// Export for use by the verify route (same serverless instance)
-export function consumeNonce(pubkey: string, nonce: string): boolean {
-  const stored = nonceStore.get(pubkey);
-  if (!stored) return false;
-  if (stored.nonce !== nonce) return false;
+// Validate that a seed honk challenge was issued and is still fresh
+export function consumeChallenge(
+  pubkey: string,
+  seedHonkId: string
+): SeedHonkParams | null {
+  const stored = challengeStore.get(pubkey);
+  if (!stored) return null;
+  if (stored.params.id !== seedHonkId) return null;
   if (stored.expiresAt < Date.now()) {
-    nonceStore.delete(pubkey);
-    return false;
+    challengeStore.delete(pubkey);
+    return null;
   }
-  nonceStore.delete(pubkey); // One-time use
-  return true;
+  challengeStore.delete(pubkey); // One-time use
+  return stored.params;
 }
