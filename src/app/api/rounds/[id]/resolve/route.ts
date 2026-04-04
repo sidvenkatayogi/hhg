@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getRoundById } from "@/lib/rounds";
-import { getGameState, resolveRound } from "@/lib/game-state";
+import { getGameState } from "@/lib/game-state";
 
 export async function POST(
   _request: Request,
@@ -14,18 +14,10 @@ export async function POST(
   }
 
   const state = getGameState();
-  if (state.roundStatus === "resolved") {
-    return NextResponse.json({ error: "Round already resolved" }, { status: 400 });
-  }
-
-  const success = resolveRound(round.correctOutcome);
-  if (!success) {
-    return NextResponse.json({ error: "Failed to resolve round" }, { status: 500 });
-  }
 
   return NextResponse.json({
     success: true,
-    winningOption: round.correctOutcome,
+    winningOption: state.winningOption ?? round.correctOutcome,
     winningLabel: round.options[round.correctOutcome].label,
   });
 }

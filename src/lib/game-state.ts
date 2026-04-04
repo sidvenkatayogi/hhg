@@ -1,60 +1,144 @@
 import { getAllRounds, type Round } from "./rounds";
 
-export type RoundStatus = "betting" | "countdown" | "revealing" | "resolved";
-
-export interface UserBetInfo {
-  pubkey: string;
-  option: number;
-  amount: number; // in SOL
-  roundId: string;
-}
+export type RoundStatus = "betting" | "revealing" | "resolved";
 
 export interface GameState {
   currentRoundIndex: number;
   roundStatus: RoundStatus;
-  bettingEndsAt: number; // Unix timestamp ms
+  bettingEndsAt: number;
   roundStartedAt: number;
-  bets: Record<string, UserBetInfo>; // pubkey -> bet info for current round
-  betTotals: number[]; // total SOL per option
+  betTotals: number[];
   totalPot: number;
-  leaderboard: Record<string, number>; // pubkey -> total winnings in SOL
+  leaderboard: Array<{ pubkey: string; totalWon: number }>;
   winningOption: number | null;
 }
 
-const BETTING_DURATION_MS = 60_000; // 60 seconds
-const REVEAL_DURATION_MS = 15_000; // 15 seconds before next round
+// ── Timing constants ──
+const BETTING_DURATION_S = 60;
+const REVEAL_DURATION_S = 15;
+const ROUND_DURATION_S = BETTING_DURATION_S + REVEAL_DURATION_S; // 75s per round
 
-let gameState: GameState | null = null;
+// Fixed epoch — all instances agree on when "round 0" started.
+// Set to a recent past time so rounds are already cycling.
+// Using midnight UTC Apr 1 2025 as an arbitrary anchor.
+const EPOCH_MS = new Date("2025-04-01T00:00:00Z").getTime();
 
-function createInitialState(): GameState {
-  const rounds = getAllRounds();
-  const now = Date.now();
-  return {
-    currentRoundIndex: 0,
-    roundStatus: "betting",
-    bettingEndsAt: now + BETTING_DURATION_MS,
-    roundStartedAt: now,
-    bets: {},
-    betTotals: new Array(rounds[0]?.options.length ?? 4).fill(0),
-    totalPot: 0,
-    leaderboard: {},
-    winningOption: null,
+// ── Mock wallets ──
+const MOCK_WALLETS = [
+  "H0nkM4ster69420xDeGenGoose111111111111",
+  "G00seWh1sper3r42069xSolBets11111111111",
+  "QuAcKlOrD99xDev1l1shG00se111111111111",
+  "W4terF0wlW4ger5xPr0Degen1111111111111",
+  "B1rdBra1nBets88xH0nkH0nk111111111111",
+  "F34therF1nance777xG00seG0d1111111111",
+  "P0ndPr0f1t5xW1ngM4n42069111111111111",
+  "H0nkZ0neVIP69xB1gB1rdBets1111111111",
+  "G00seJu1ce420xD3g3nDuck11111111111111",
+  "N3stEgg99xF0wlPl4yBets111111111111111",
+  "W4ddl3W4ll3t55xG00seBoss1111111111111",
+  "B34kBr34k3r77xH0nkSt0nks111111111111",
+];
+
+// ── Seeded random (deterministic per-round) ──
+function seededRandom(seed: number): () => number {
+  let s = seed;
+  return () => {
+    s = (s * 1664525 + 1013904223) & 0x7fffffff;
+    return s / 0x7fffffff;
   };
 }
 
+// ── Generate deterministic mock bets for a round ──
+function generateMockBets(
+  roundIndex: number,
+  optionsCount: number,
+  correctOutcome: number,
+  elapsedS: number
+): { betTotals: number[]; totalPot: number } {
+  const rng = seededRandom(roundIndex * 9999 + 42);
+  const betTotals = new Array(optionsCount).fill(0);
+  let totalPot = 0;
+
+  // Each bot "arrives" at a deterministic time in the betting window
+  for (let i = 0; i < MOCK_WALLETS.length; i++) {
+    const arriveAt = 3 + rng() * (BETTING_DURATION_S - 5); // arrive between 3s and 55s
+    if (elapsedS < arriveAt) continue; // hasn't arrived yet
+
+    // Pick option — 40% correct, 60% random
+    const option = rng() < 0.4 ? correctOutcome : Math.floor(rng() * optionsCount);
+    // Wager 0.05–2.0 SOL
+    const amount = Math.round((0.05 + rng() * 1.95) * 100) / 100;
+
+    betTotals[option] += amount;
+    totalPot += amount;
+  }
+
+  // Round to 2 decimals
+  for (let i = 0; i < betTotals.length; i++) {
+    betTotals[i] = Math.round(betTotals[i] * 100) / 100;
+  }
+  totalPot = Math.round(totalPot * 100) / 100;
+
+  return { betTotals, totalPot };
+}
+
+// ── Generate deterministic leaderboard ──
+function generateLeaderboard(): Array<{ pubkey: string; totalWon: number }> {
+  const rng = seededRandom(1337);
+  return MOCK_WALLETS.slice(0, 7)
+    .map((pubkey) => ({
+      pubkey,
+      totalWon: Math.round((1 + rng() * 14) * 100) / 100,
+    }))
+    .sort((a, b) => b.totalWon - a.totalWon);
+}
+
+// ── Core: compute game state from current time ──
 export function getGameState(): GameState {
-  if (!gameState) {
-    gameState = createInitialState();
-  }
-
-  // Auto-advance logic
   const now = Date.now();
+  const rounds = getAllRounds();
+  const roundCount = rounds.length;
 
-  if (gameState.roundStatus === "betting" && now >= gameState.bettingEndsAt) {
-    gameState.roundStatus = "revealing";
+  const elapsedSinceEpochS = (now - EPOCH_MS) / 1000;
+  const totalRoundsPassed = Math.floor(elapsedSinceEpochS / ROUND_DURATION_S);
+  const currentRoundIndex = totalRoundsPassed % roundCount;
+  const round = rounds[currentRoundIndex];
+
+  const roundStartMs = EPOCH_MS + totalRoundsPassed * ROUND_DURATION_S * 1000;
+  const bettingEndsMs = roundStartMs + BETTING_DURATION_S * 1000;
+  const elapsedInRoundS = (now - roundStartMs) / 1000;
+
+  let roundStatus: RoundStatus;
+  let winningOption: number | null = null;
+
+  if (elapsedInRoundS < BETTING_DURATION_S) {
+    roundStatus = "betting";
+  } else if (elapsedInRoundS < ROUND_DURATION_S) {
+    roundStatus = "resolved";
+    winningOption = round.correctOutcome;
+  } else {
+    roundStatus = "betting";
   }
 
-  return gameState;
+  // Mock bets — grow over the betting period, freeze at close
+  const betElapsed = Math.min(elapsedInRoundS, BETTING_DURATION_S);
+  const { betTotals, totalPot } = generateMockBets(
+    totalRoundsPassed,
+    round.options.length,
+    round.correctOutcome,
+    betElapsed
+  );
+
+  return {
+    currentRoundIndex,
+    roundStatus,
+    bettingEndsAt: bettingEndsMs,
+    roundStartedAt: roundStartMs,
+    betTotals,
+    totalPot,
+    leaderboard: generateLeaderboard(),
+    winningOption,
+  };
 }
 
 export function getCurrentRound(): Round | undefined {
@@ -63,88 +147,15 @@ export function getCurrentRound(): Round | undefined {
   return rounds[state.currentRoundIndex];
 }
 
-export function placeBet(pubkey: string, option: number, amount: number): boolean {
-  const state = getGameState();
-
-  if (state.roundStatus !== "betting") return false;
-  if (Date.now() >= state.bettingEndsAt) return false;
-  if (state.bets[pubkey]) return false; // already bet this round
-
-  const round = getCurrentRound();
-  if (!round || option < 0 || option >= round.options.length) return false;
-
-  state.bets[pubkey] = {
-    pubkey,
-    option,
-    amount,
-    roundId: round.id,
-  };
-  state.betTotals[option] += amount;
-  state.totalPot += amount;
-
-  return true;
-}
-
-export function resolveRound(winningOption: number): boolean {
-  const state = getGameState();
-  if (state.roundStatus === "resolved") return false;
-
-  const round = getCurrentRound();
-  if (!round || winningOption < 0 || winningOption >= round.options.length) return false;
-
-  state.roundStatus = "resolved";
-  state.winningOption = winningOption;
-
-  // Calculate winnings
-  const winningTotal = state.betTotals[winningOption];
-  if (winningTotal > 0) {
-    for (const bet of Object.values(state.bets)) {
-      if (bet.option === winningOption) {
-        const share = (bet.amount / winningTotal) * state.totalPot;
-        state.leaderboard[bet.pubkey] = (state.leaderboard[bet.pubkey] || 0) + share;
-      }
-    }
-  }
-
-  // Schedule auto-advance
-  setTimeout(() => {
-    advanceRound();
-  }, REVEAL_DURATION_MS);
-
-  return true;
-}
-
-export function advanceRound(): void {
-  const state = getGameState();
-  const rounds = getAllRounds();
-  const nextIndex = (state.currentRoundIndex + 1) % rounds.length;
-  const nextRound = rounds[nextIndex];
-  const now = Date.now();
-
-  state.currentRoundIndex = nextIndex;
-  state.roundStatus = "betting";
-  state.bettingEndsAt = now + BETTING_DURATION_MS;
-  state.roundStartedAt = now;
-  state.bets = {};
-  state.betTotals = new Array(nextRound?.options.length ?? 4).fill(0);
-  state.totalPot = 0;
-  state.winningOption = null;
-}
-
 export function getLeaderboard(): Array<{ pubkey: string; totalWon: number }> {
-  const state = getGameState();
-  return Object.entries(state.leaderboard)
-    .map(([pubkey, totalWon]) => ({ pubkey, totalWon }))
-    .sort((a, b) => b.totalWon - a.totalWon)
-    .slice(0, 10);
+  return getGameState().leaderboard;
 }
 
 export function getStats() {
   const state = getGameState();
-  const totalBets = Object.keys(state.bets).length;
   return {
     totalVolume: state.totalPot,
-    totalBets,
+    totalBets: MOCK_WALLETS.length,
     roundsPlayed: state.currentRoundIndex,
   };
 }

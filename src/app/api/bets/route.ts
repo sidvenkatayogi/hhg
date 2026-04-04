@@ -1,22 +1,23 @@
 import { NextResponse } from "next/server";
-import { placeBet } from "@/lib/game-state";
+import { getGameState } from "@/lib/game-state";
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { pubkey, roundId, option, amount } = body;
+  const { pubkey, option, amount, roundId } = body;
 
   if (!pubkey || option === undefined || !amount || !roundId) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  const success = placeBet(pubkey, option, amount);
-
-  if (!success) {
+  const state = getGameState();
+  if (state.roundStatus !== "betting") {
     return NextResponse.json(
-      { error: "Bet failed. Betting may be closed or you already bet this round." },
+      { error: "Betting is closed for this round." },
       { status: 400 }
     );
   }
 
+  // In deterministic mode, real user bets are accepted client-side.
+  // The server just validates timing.
   return NextResponse.json({ success: true });
 }

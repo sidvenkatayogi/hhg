@@ -2,39 +2,16 @@
 
 import { useGameState } from "@/hooks/useGameState";
 import { useBetting } from "@/hooks/useBetting";
-import { resolveRound } from "@/lib/api";
 import VideoPlayer from "./VideoPlayer";
 import BettingPanel from "./BettingPanel";
 import CountdownTimer from "./CountdownTimer";
 import RevealSequence from "./RevealSequence";
 import Leaderboard from "./Leaderboard";
 import WalletConnect from "./WalletConnect";
-import { useEffect, useRef } from "react";
 
 export default function GooseArena() {
-  const { state, refresh } = useGameState();
-  const { getUserBet, getUserWager, recordUserBet } = useBetting();
-  const resolvedRef = useRef<string | null>(null);
-
-  // Auto-resolve when betting ends
-  useEffect(() => {
-    if (!state?.round) return;
-    if (
-      state.status === "revealing" &&
-      resolvedRef.current !== state.round.id
-    ) {
-      resolvedRef.current = state.round.id;
-      // Small delay for drama
-      setTimeout(async () => {
-        try {
-          await resolveRound(state.round!.id);
-          refresh();
-        } catch {
-          // already resolved or error
-        }
-      }, 3000);
-    }
-  }, [state, refresh]);
+  const { state } = useGameState();
+  const { getUserBet, getUserWager } = useBetting();
 
   if (!state || !state.round) {
     return (
@@ -51,7 +28,7 @@ export default function GooseArena() {
   const userBet = getUserBet(round.id);
   const userWager = getUserWager(round.id);
   const isBettingOpen = status === "betting";
-  const isRevealing = status === "revealing" || status === "resolved";
+  const isRevealing = status === "resolved";
 
   return (
     <div className="min-h-screen bg-background noise-bg">
@@ -108,7 +85,6 @@ export default function GooseArena() {
             betTotals={betTotals}
             userWager={userWager}
             onClaim={() => {
-              // In a full implementation, this would trigger on-chain claim
               console.log("Claiming winnings...");
             }}
           />
@@ -132,7 +108,7 @@ export default function GooseArena() {
               {[1, 2].map((k) => (
                 <span key={k} className="text-xs text-muted mx-4">
                   🪿 HONK HONK HONK — Total Volume Honked: {totalPot.toFixed(2)}{" "}
-                  SOL — Bets Placed: {Object.values(betTotals).length} — Geese
+                  SOL — Bets Placed: {betTotals.length} — Geese
                   Angered: 42 — HONK HONK HONK —{" "}
                 </span>
               ))}
