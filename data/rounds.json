@@ -55,62 +55,6 @@
         { "index": 3, "label": "🏎️ Chase the golf cart" }
       ],
       "correctOutcome": 0
-    },
-    {
-      "id": "round_005",
-      "title": "The Sandwich Standoff II",
-      "description": "The goose is back. Another sandwich. Another victim. Will it play out the same way? Place your bets.",
-      "setupVideo": "/videos/round_001_setup.mp4",
-      "revealVideo": "/videos/round_001_reveal.mp4",
-      "options": [
-        { "index": 0, "label": "🥪 Snatch it again, obviously" },
-        { "index": 1, "label": "🫡 Reformed goose walks away" },
-        { "index": 2, "label": "🗣️ Honk so loud the sandwich explodes" },
-        { "index": 3, "label": "🧍 Menacing stare (extended cut)" }
-      ],
-      "correctOutcome": 0
-    },
-    {
-      "id": "round_006",
-      "title": "Shopping Cart Heist: Part Deux",
-      "description": "Same cart. Same goose. Different day. The parking lot is its kingdom now.",
-      "setupVideo": "/videos/round_003_setup.mp4",
-      "revealVideo": "/videos/round_003_reveal.mp4",
-      "options": [
-        { "index": 0, "label": "🛒 Grand theft cart" },
-        { "index": 1, "label": "💥 Tip it for fun" },
-        { "index": 2, "label": "🪑 Throne reclaimed" },
-        { "index": 3, "label": "💩 Mark its territory" }
-      ],
-      "correctOutcome": 2
-    },
-    {
-      "id": "round_007",
-      "title": "The Picnic Raid: Reloaded",
-      "description": "Fool me once, shame on the goose. Fool me twice... still shame on the goose. Nobody learns.",
-      "setupVideo": "/videos/round_004_setup.mp4",
-      "revealVideo": "/videos/round_004_reveal.mp4",
-      "options": [
-        { "index": 0, "label": "🍕 Devour the entire spread" },
-        { "index": 1, "label": "🧹 Blanket heist 2.0" },
-        { "index": 2, "label": "🛋️ Just vibing on the blanket" },
-        { "index": 3, "label": "🐜 Start a turf war with ants" }
-      ],
-      "correctOutcome": 1
-    },
-    {
-      "id": "round_008",
-      "title": "Golf Course Chaos: Back Nine",
-      "description": "The golfer hired security. It didn't help. The goose plays by its own rules.",
-      "setupVideo": "/videos/round_005_setup.mp4",
-      "revealVideo": "/videos/round_005_reveal.mp4",
-      "options": [
-        { "index": 0, "label": "⛳ Ball thief strikes again" },
-        { "index": 1, "label": "📢 Honk a hole-in-one" },
-        { "index": 2, "label": "🕳️ Claim the 18th hole as a nest" },
-        { "index": 3, "label": "🏎️ Commandeer the golf cart" }
-      ],
-      "correctOutcome": 0
     }
   ]
 }
