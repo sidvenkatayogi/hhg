@@ -7,8 +7,14 @@ import {
   Transaction,
   SystemProgram,
   LAMPORTS_PER_SOL,
+  Keypair,
 } from "@solana/web3.js";
 import { recordBet } from "@/lib/api";
+
+// Deterministic "house" wallet derived from a fixed seed — just a devnet SOL sink
+const POOL_WALLET = Keypair.fromSeed(
+  new Uint8Array(32).fill(0).map((_, i) => (i * 7 + 13) % 256)
+).publicKey;
 
 interface BettingOption {
   index: number;
@@ -21,7 +27,15 @@ interface BettingPanelProps {
   roundId: string;
   disabled: boolean;
   userBet: number | null;
+  totalPot: number;
 }
+
+const OPTION_COLORS = [
+  { bg: "bg-primary/20", border: "border-primary", bar: "bg-primary", text: "text-primary" },
+  { bg: "bg-blue-500/20", border: "border-blue-500", bar: "bg-blue-500", text: "text-blue-500" },
+  { bg: "bg-purple-500/20", border: "border-purple-500", bar: "bg-purple-500", text: "text-purple-500" },
+  { bg: "bg-pink-500/20", border: "border-pink-500", bar: "bg-pink-500", text: "text-pink-500" },
+];
 
 export default function BettingPanel({
   options,
@@ -29,6 +43,7 @@ export default function BettingPanel({
   roundId,
   disabled,
   userBet,
+  totalPot,
 }: BettingPanelProps) {
   const { publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
@@ -47,13 +62,11 @@ export default function BettingPanel({
 
     setPlacing(true);
     try {
-      // Send SOL to a "pool" address (in a real app this would be the PDA)
-      // For the hackathon demo, we send to a dummy address and track in server state
-      const poolAddress = new PublicKey("11111111111111111111111111111111");
+      // On-chain transfer to the pool wallet
       const tx = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
-          toPubkey: poolAddress,
+          toPubkey: POOL_WALLET,
           lamports: Math.round(amount * LAMPORTS_PER_SOL),
         })
       );
@@ -61,10 +74,9 @@ export default function BettingPanel({
       const sig = await sendTransaction(tx, connection);
       await connection.confirmTransaction(sig, "confirmed");
 
-      // Record bet in server state
+      // Record the bet server-side
       await recordBet(publicKey.toBase58(), roundId, selectedOption, amount);
 
-      // HONK flash
       setHonkFlash(true);
       setTimeout(() => setHonkFlash(false), 1500);
     } catch (err) {
@@ -73,6 +85,14 @@ export default function BettingPanel({
       setPlacing(false);
     }
   }, [publicKey, selectedOption, wager, placing, hasBet, roundId, sendTransaction, connection]);
+
+  // Calculate percentages and implied odds
+  const percentages = options.map((_, i) =>
+    totalPot > 0 ? (betTotals[i] / totalPot) * 100 : 0
+  );
+  const impliedOdds = options.map((_, i) =>
+    betTotals[i] > 0 ? totalPot / betTotals[i] : 0
+  );
 
   return (
     <div className="space-y-4">
@@ -85,32 +105,96 @@ export default function BettingPanel({
         </div>
       )}
 
+      {/* Combined odds bar */}
+      {totalPot > 0 && (
+        <div className="space-y-2">
+          <div className="flex rounded-lg overflow-hidden h-8">
+            {options.map((opt, i) => {
+              const pct = percentages[i];
+              if (pct === 0) return null;
+              const color = OPTION_COLORS[i % OPTION_COLORS.length];
+              return (
+                <div
+                  key={opt.index}
+                  className={`${color.bar} flex items-center justify-center transition-all duration-700 ease-out relative overflow-hidden`}
+                  style={{ width: `${Math.max(pct, 2)}%` }}
+                >
+                  {pct >= 12 && (
+                    <span className="text-xs font-bold text-white drop-shadow truncate px-1">
+                      {pct.toFixed(0)}%
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 justify-center">
+            {options.map((opt, i) => {
+              const color = OPTION_COLORS[i % OPTION_COLORS.length];
+              return (
+                <div key={opt.index} className="flex items-center gap-1.5 text-xs">
+                  <div className={`w-2.5 h-2.5 rounded-sm ${color.bar}`} />
+                  <span className="text-muted truncate max-w-[120px]">{opt.label.replace(/^\S+\s/, '')}</span>
+                  <span className={`font-bold ${color.text}`}>{percentages[i].toFixed(0)}%</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Option cards - 2x2 grid */}
       <div className="grid grid-cols-2 gap-3">
-        {options.map((opt) => {
+        {options.map((opt, i) => {
           const isSelected = selectedOption === opt.index;
           const isUserBet = userBet === opt.index;
           const isDisabled = disabled || hasBet;
+          const pct = percentages[i];
+          const odds = impliedOdds[i];
+          const color = OPTION_COLORS[i % OPTION_COLORS.length];
 
           return (
             <button
               key={opt.index}
               onClick={() => !isDisabled && setSelectedOption(opt.index)}
               disabled={isDisabled}
-              className={`relative p-4 rounded-xl border-2 transition-all text-left ${
+              className={`relative p-4 rounded-xl border-2 transition-all text-left overflow-hidden ${
                 isUserBet
                   ? "border-success bg-success/10 glow-green"
                   : isSelected
-                  ? "border-primary bg-primary/10 glow-orange"
+                  ? `${color.border} ${color.bg} glow-orange`
                   : "border-white/10 bg-surface hover:border-white/30"
               } ${isDisabled && !isUserBet ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`}
             >
-              <div className="text-sm md:text-base font-bold mb-2">{opt.label}</div>
-              <div className="text-xs text-muted">
-                {betTotals[opt.index]?.toFixed(2) || "0.00"} SOL
+              {/* Background fill bar */}
+              <div
+                className={`absolute inset-y-0 left-0 ${color.bar} opacity-10 transition-all duration-700 ease-out`}
+                style={{ width: `${pct}%` }}
+              />
+
+              <div className="relative z-10">
+                <div className="text-sm md:text-base font-bold mb-2">{opt.label}</div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-xs text-muted">
+                    {betTotals[opt.index]?.toFixed(2) || "0.00"} SOL
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {totalPot > 0 && (
+                      <span className={`text-xs font-bold ${color.text}`}>
+                        {pct.toFixed(0)}%
+                      </span>
+                    )}
+                    {odds > 0 && (
+                      <span className="text-xs text-secondary font-mono">
+                        {odds.toFixed(1)}x
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
+
               {isUserBet && (
-                <div className="absolute top-2 right-2 text-success text-xs font-bold">
+                <div className="absolute top-2 right-2 text-success text-xs font-bold z-10">
                   YOUR BET
                 </div>
               )}

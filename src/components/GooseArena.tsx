@@ -4,6 +4,7 @@ import { useGameState } from "@/hooks/useGameState";
 import { useBetting } from "@/hooks/useBetting";
 import VideoPlayer from "./VideoPlayer";
 import BettingPanel from "./BettingPanel";
+import BetFeed from "./BetFeed";
 import CountdownTimer from "./CountdownTimer";
 import RevealSequence from "./RevealSequence";
 import Leaderboard from "./Leaderboard";
@@ -95,8 +96,17 @@ export default function GooseArena() {
             roundId={round.id}
             disabled={!isBettingOpen}
             userBet={userBet}
+            totalPot={totalPot}
           />
         )}
+
+        {/* Live bet feed */}
+        <BetFeed
+          betTotals={betTotals}
+          totalPot={totalPot}
+          options={round.options}
+          status={status}
+        />
 
         {/* Leaderboard */}
         <Leaderboard />
