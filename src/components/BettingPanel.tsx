@@ -28,6 +28,7 @@ interface BettingPanelProps {
   disabled: boolean;
   userBet: number | null;
   totalPot: number;
+  honkLocked?: boolean;
 }
 
 const OPTION_COLORS = [
@@ -44,6 +45,7 @@ export default function BettingPanel({
   disabled,
   userBet,
   totalPot,
+  honkLocked = false,
 }: BettingPanelProps) {
   const { publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
@@ -236,9 +238,15 @@ export default function BettingPanel({
         </div>
       )}
 
-      {disabled && !hasBet && (
+      {disabled && !hasBet && !honkLocked && (
         <div className="text-center py-2 text-danger font-bold text-lg">
           BETTING CLOSED
+        </div>
+      )}
+
+      {disabled && !hasBet && honkLocked && (
+        <div className="text-center py-2 text-primary font-bold text-sm">
+          HONK-IN REQUIRED — Authenticate your goose vocalization to place bets.
         </div>
       )}
     </div>
