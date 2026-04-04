@@ -63,3 +63,32 @@ export async function recordBet(
   });
   if (!res.ok) throw new Error("Failed to record bet");
 }
+
+// ── Honk-in Auth API ──
+
+export async function fetchHonkChallenge(
+  pubkey: string
+): Promise<{ nonce: string; expiresAt: number }> {
+  const res = await fetch(`/api/honk-auth/challenge?pubkey=${encodeURIComponent(pubkey)}`);
+  if (!res.ok) throw new Error("Failed to fetch honk challenge");
+  return res.json();
+}
+
+export async function verifyHonkAuth(data: {
+  pubkey: string;
+  honkprintDigest: string;
+  tier: string;
+  similarity: number;
+  nonce?: string;
+}): Promise<{ success: boolean; message: string }> {
+  const res = await fetch("/api/honk-auth/verify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Honk authentication failed");
+  }
+  return res.json();
+}

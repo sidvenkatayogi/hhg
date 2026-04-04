@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import WalletProvider from "@/components/WalletProvider";
+import HonkAuthProvider from "@/components/HonkAuthProvider";
+import HonkOtpFlow from "@/components/HonkOtpFlow";
 
 export const metadata: Metadata = {
   title: "GOOSE BETS — Degenerate Waterfowl Gambling",
@@ -19,7 +21,12 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased">
       <head />
       <body className="min-h-full flex flex-col bg-background text-foreground font-mono">
-        <WalletProvider>{children}</WalletProvider>
+        <WalletProvider>
+          <HonkAuthProvider>
+            {children}
+            <HonkOtpFlow />
+          </HonkAuthProvider>
+        </WalletProvider>
       </body>
     </html>
   );

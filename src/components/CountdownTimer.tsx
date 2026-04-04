@@ -46,13 +46,21 @@ export default function CountdownTimer({ bettingEndsAt, status }: CountdownTimer
         className={`inline-block rounded-xl px-6 py-3 border ${
           isUrgent
             ? "bg-danger/20 border-danger/50 animate-scale-pulse"
-            : "bg-surface border-white/10"
+            : "border-[rgba(253,251,245,0.28)] bg-[rgba(56,34,16,0.92)] shadow-md [text-shadow:0_1px_2px_rgba(0,0,0,0.45)]"
         }`}
       >
-        <span className="text-muted text-sm mr-2">Time remaining</span>
+        <span
+          className={`text-sm mr-2 ${
+            isUrgent ? "text-danger/90" : "text-[rgba(253,251,245,0.9)]"
+          }`}
+        >
+          Time remaining
+        </span>
         <span
           className={`font-bold text-2xl tabular-nums ${
-            isUrgent ? "text-danger" : "text-foreground"
+            isUrgent
+              ? "text-danger"
+              : "text-[#fdfbf5] drop-shadow-[0_1px_3px_rgba(0,0,0,0.55)]"
           }`}
         >
           {minutes}:{secs.toString().padStart(2, "0")}
