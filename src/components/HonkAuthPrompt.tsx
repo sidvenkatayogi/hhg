@@ -17,7 +17,7 @@ export default function HonkAuthPrompt() {
   if (isAuthenticated) return null;
 
   return (
-    <div className="bg-surface border-2 border-primary/50 rounded-xl p-6 space-y-4">
+    <div className="honk-on-surface bg-surface border-2 border-primary/50 rounded-xl p-6 space-y-4">
       <div className="text-center space-y-2">
         <div className="text-4xl">🪿</div>
         <h3 className="text-xl font-display text-primary">
@@ -25,7 +25,7 @@ export default function HonkAuthPrompt() {
             ? "HONK-OTP VERIFICATION"
             : "HONK-OTP REGISTRATION REQUIRED"}
         </h3>
-        <p className="text-muted text-sm">
+        <p className="honk-on-surface-muted text-sm">
           {isRegistered
             ? `Phone ${phoneNumber} on file. Start Honk verification—the Seed Honk plays in this browser (no real call).`
             : "No phone on file. Register a contact number to continue (prototype: stored locally only)."}
@@ -36,10 +36,10 @@ export default function HonkAuthPrompt() {
         <div
           className={`p-3 rounded-lg border text-sm text-center ${
             authError.severity === "critical"
-              ? "bg-danger/20 border-danger text-danger"
+              ? "bg-danger/25 border-danger text-[#fff5f5]"
               : authError.severity === "error"
-              ? "bg-primary/20 border-primary text-primary"
-              : "bg-secondary/20 border-secondary text-secondary"
+              ? "bg-black/35 border-primary text-[#fff8ed]"
+              : "bg-black/35 border-secondary text-[#fffbeb]"
           }`}
         >
           <span className="font-bold">
@@ -47,7 +47,7 @@ export default function HonkAuthPrompt() {
           </span>{" "}
           {authError.message}
           {authAttempts >= 1 && (
-            <p className="mt-1 text-xs">Attempt {authAttempts}.</p>
+            <p className="mt-1 text-xs opacity-90">Attempt {authAttempts}.</p>
           )}
         </div>
       )}
@@ -57,7 +57,7 @@ export default function HonkAuthPrompt() {
           <>
             <button
               onClick={reRegister}
-              className="flex-1 py-3 rounded-lg border border-white/20 text-muted hover:bg-white/5 transition-colors text-sm"
+              className="flex-1 py-3 rounded-lg border border-white/25 honk-on-surface-muted hover:bg-white/10 transition-colors text-sm"
             >
               Change Phone
             </button>

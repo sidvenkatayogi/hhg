@@ -49,7 +49,9 @@ export function linearResample(
 export function playFloat32Pcm(
   ctx: AudioContext,
   channelData: Float32Array,
-  sampleRate: number
+  sampleRate: number,
+  /** Output gain (>1 = louder seed honk vs other page audio, already ducked). */
+  playbackGain: number = 1.35
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     try {
@@ -57,7 +59,10 @@ export function playFloat32Pcm(
       buffer.copyToChannel(channelData, 0);
       const src = ctx.createBufferSource();
       src.buffer = buffer;
-      src.connect(ctx.destination);
+      const gain = ctx.createGain();
+      gain.gain.value = Math.min(playbackGain, 2.5);
+      src.connect(gain);
+      gain.connect(ctx.destination);
       src.onended = () => resolve();
       src.start();
     } catch (e) {

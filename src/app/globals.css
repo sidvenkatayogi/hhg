@@ -50,6 +50,17 @@ body {
   border-color: rgba(56, 34, 16, 0.6) !important;
 }
 
+/* Cream/off-white text on brown glass — Tailwind `text-muted` (#888) fails contrast here */
+.honk-on-surface {
+  color: rgb(253, 251, 245);
+}
+.honk-on-surface-muted {
+  color: rgba(253, 251, 245, 0.9);
+}
+.honk-on-surface-subtle {
+  color: rgba(253, 251, 245, 0.72);
+}
+
 /* Wallet adapter overrides */
 .wallet-adapter-button {
   background-color: var(--brown) !important;

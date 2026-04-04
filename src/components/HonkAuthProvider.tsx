@@ -18,7 +18,7 @@ import type {
   HonkErrorCode,
   HonkChallengeResponse,
 } from "@/lib/honk-types";
-import { HONK_ERRORS } from "@/lib/honk-types";
+import { HONK_ERRORS, isHonkVerificationSiteMuteStep } from "@/lib/honk-types";
 import {
   captureHonk,
   saveRegistration,
@@ -35,6 +35,7 @@ import {
 import { synthesizeSeedHonk, renderSeedHonkReference } from "@/lib/seed-honk";
 import { verifyHonkOtp } from "@/lib/honk-otp-verify";
 import { recordAuthAttempt } from "@/lib/honk-metrics";
+import { useHonkVerificationSiteMute } from "@/hooks/useHonkVerificationSiteMute";
 
 interface HonkAuthContextValue {
   session: HonkSession | null;
@@ -95,6 +96,8 @@ export default function HonkAuthProvider({
   const phoneNumber = registration?.phoneNumber ?? null;
   const isAuthenticated = session !== null && session.pubkey === pubkey;
   const tier = session?.tier ?? null;
+
+  useHonkVerificationSiteMute(isHonkVerificationSiteMuteStep(otpState.step));
 
   useEffect(() => {
     if (!pubkey) {

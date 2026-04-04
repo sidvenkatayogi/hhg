@@ -3,6 +3,9 @@
 
 import type { SeedHonkParams } from "./honk-types";
 
+/** Peak envelope level — louder, chestier honk (Web Audio path). */
+const SYNTH_MASTER_PEAK = 0.88;
+
 // ── Parameter generation (used by API route) ──
 
 function randomInRange(min: number, max: number): number {
@@ -15,7 +18,8 @@ export function generateSeedHonkParams(): SeedHonkParams {
 
   return {
     id,
-    fundamentalHz: randomInRange(180, 420),
+    // Bias low: large Canada goose honk is fundamentally deep (~150–320 Hz).
+    fundamentalHz: randomInRange(145, 320),
     harmonics: [
       randomInRange(0.3, 0.8), // 2nd harmonic (strong in goose honks)
       randomInRange(0.2, 0.7), // 3rd harmonic
@@ -71,12 +75,15 @@ export function synthesizeSeedHonk(
     // Master gain (ADSR envelope)
     const masterGain = ctx.createGain();
     masterGain.gain.setValueAtTime(0, now);
-    masterGain.gain.linearRampToValueAtTime(0.6, now + attackSec);
+    masterGain.gain.linearRampToValueAtTime(SYNTH_MASTER_PEAK, now + attackSec);
     masterGain.gain.linearRampToValueAtTime(
-      0.6 * sustainLevel,
+      SYNTH_MASTER_PEAK * sustainLevel,
       now + attackSec + decaySec
     );
-    masterGain.gain.setValueAtTime(0.6 * sustainLevel, now + sustainEnd);
+    masterGain.gain.setValueAtTime(
+      SYNTH_MASTER_PEAK * sustainLevel,
+      now + sustainEnd
+    );
     masterGain.gain.linearRampToValueAtTime(0, now + durSec);
 
     // Aggression distortion
@@ -87,7 +94,7 @@ export function synthesizeSeedHonk(
     // Bandpass resonance (goose formant ~800 Hz)
     const bandpass = ctx.createBiquadFilter();
     bandpass.type = "bandpass";
-    bandpass.frequency.value = 800;
+    bandpass.frequency.value = 680;
     bandpass.Q.value = 1 + params.aggressionCoefficient * 3;
 
     // FM vibrato LFO
@@ -116,7 +123,7 @@ export function synthesizeSeedHonk(
       const gain = ctx.createGain();
       osc.type = "sawtooth";
       osc.frequency.value = params.fundamentalHz * (i + 2);
-      gain.gain.value = params.harmonics[i] * 0.3;
+      gain.gain.value = params.harmonics[i] * 0.36;
       osc.connect(gain);
       gain.connect(waveshaper);
       osc.start(now);
@@ -155,12 +162,15 @@ export async function renderSeedHonkReference(
   // Master gain (ADSR)
   const masterGain = offlineCtx.createGain();
   masterGain.gain.setValueAtTime(0, now);
-  masterGain.gain.linearRampToValueAtTime(0.6, now + attackSec);
+  masterGain.gain.linearRampToValueAtTime(SYNTH_MASTER_PEAK, now + attackSec);
   masterGain.gain.linearRampToValueAtTime(
-    0.6 * sustainLevel,
+    SYNTH_MASTER_PEAK * sustainLevel,
     now + attackSec + decaySec
   );
-  masterGain.gain.setValueAtTime(0.6 * sustainLevel, now + sustainEnd);
+  masterGain.gain.setValueAtTime(
+    SYNTH_MASTER_PEAK * sustainLevel,
+    now + sustainEnd
+  );
   masterGain.gain.linearRampToValueAtTime(0, now + durSec);
 
   // Aggression distortion
@@ -171,7 +181,7 @@ export async function renderSeedHonkReference(
   // Bandpass
   const bandpass = offlineCtx.createBiquadFilter();
   bandpass.type = "bandpass";
-  bandpass.frequency.value = 800;
+  bandpass.frequency.value = 680;
   bandpass.Q.value = 1 + params.aggressionCoefficient * 3;
 
   // FM vibrato LFO
@@ -199,7 +209,7 @@ export async function renderSeedHonkReference(
     const gain = offlineCtx.createGain();
     osc.type = "sawtooth";
     osc.frequency.value = params.fundamentalHz * (i + 2);
-    gain.gain.value = params.harmonics[i] * 0.3;
+    gain.gain.value = params.harmonics[i] * 0.36;
     osc.connect(gain);
     gain.connect(waveshaper);
     osc.start(now);

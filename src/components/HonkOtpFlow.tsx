@@ -18,7 +18,7 @@ export default function HonkOtpFlow() {
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="bg-surface border-2 border-primary rounded-2xl p-8 max-w-lg w-full mx-4 space-y-6">
+      <div className="honk-on-surface bg-surface border-2 border-primary rounded-2xl p-8 max-w-lg w-full mx-4 space-y-6">
         {/* ── Phone Entry ── */}
         {step === "phone-entry" && (
           <>
@@ -26,7 +26,7 @@ export default function HonkOtpFlow() {
               <h2 className="text-2xl font-display text-primary">
                 HONK-OTP REGISTRATION
               </h2>
-              <p className="text-muted text-sm mt-2">
+              <p className="honk-on-surface-muted text-sm mt-2">
                 Save a contact number for your Honk-OTP profile. In this
                 prototype, the Seed Honk always plays in this browser—no real
                 outbound call is placed.
@@ -34,15 +34,15 @@ export default function HonkOtpFlow() {
             </div>
 
             <div className="space-y-3">
-              <label className="block text-sm text-muted">Phone Number</label>
+              <label className="block text-sm honk-on-surface-muted">Phone Number</label>
               <input
                 type="tel"
                 value={phoneInput}
                 onChange={(e) => setPhoneInput(e.target.value)}
                 placeholder="+1 (555) 867-5309"
-                className="w-full bg-black/30 border border-white/20 rounded-lg px-4 py-3 text-foreground placeholder:text-muted/50 focus:border-primary focus:outline-none transition-colors"
+                className="w-full bg-black/40 border border-white/25 rounded-lg px-4 py-3 text-[#fdfbf5] placeholder:text-[rgba(253,251,245,0.45)] focus:border-primary focus:outline-none transition-colors"
               />
-              <p className="text-xs text-muted">
+              <p className="text-xs honk-on-surface-subtle">
                 Stored on this device only. Real voice/SMS delivery can be wired
                 in later; for now it is account metadata.
               </p>
@@ -51,7 +51,7 @@ export default function HonkOtpFlow() {
             <div className="flex gap-3">
               <button
                 onClick={cancelRegistration}
-                className="flex-1 py-3 rounded-lg border border-white/20 text-muted hover:bg-white/5 transition-colors"
+                className="flex-1 py-3 rounded-lg border border-white/25 honk-on-surface-muted hover:bg-white/10 transition-colors"
               >
                 Cancel
               </button>
@@ -90,10 +90,10 @@ export default function HonkOtpFlow() {
                 </svg>
               </div>
             </div>
-            <p className="text-muted text-sm animate-pulse">
+            <p className="honk-on-surface-muted text-sm animate-pulse">
               Fetching your challenge from the server...
             </p>
-            <p className="text-xs text-muted/60">
+            <p className="text-xs honk-on-surface-subtle">
               Audio will play through this device&apos;s speakers next—not over
               the phone network.
             </p>
@@ -135,7 +135,7 @@ export default function HonkOtpFlow() {
             <p className="text-secondary font-bold animate-pulse">
               SEED HONK PLAYING...
             </p>
-            <p className="text-xs text-muted">
+            <p className="text-xs honk-on-surface-muted">
               Listen on this computer—you will re-capture a similar honk through
               the microphone in the next step.
             </p>
@@ -165,7 +165,7 @@ export default function HonkOtpFlow() {
               Play back the honk you just heard (e.g. from another phone or
               speaker held near this mic), or produce a matching honk.
             </p>
-            <p className="text-xs text-muted">
+            <p className="text-xs honk-on-surface-muted">
               The protocol compares your microphone capture to the Seed Honk
               that played here—not to a cellular call.
             </p>
@@ -183,7 +183,7 @@ export default function HonkOtpFlow() {
               <VerifyBar label="Amplitude Dynamics" delay={0.3} />
               <VerifyBar label="Aggression Coefficient" delay={0.6} />
             </div>
-            <p className="text-muted text-sm animate-pulse">
+            <p className="honk-on-surface-muted text-sm animate-pulse">
               Running Waterfowl Handshake Protocol verification...
             </p>
           </div>
@@ -199,7 +199,7 @@ export default function HonkOtpFlow() {
             />
             <p className="text-success font-bold text-xl">ACCESS GRANTED</p>
             {matchScore !== null && (
-              <p className="text-muted text-sm">
+              <p className="honk-on-surface-muted text-sm">
                 Acoustic match: {(matchScore * 100).toFixed(1)}%
               </p>
             )}
@@ -224,19 +224,19 @@ export default function HonkOtpFlow() {
             <div
               className={`p-3 rounded-lg border text-sm ${
                 error.severity === "critical"
-                  ? "bg-danger/20 border-danger text-danger"
+                  ? "bg-danger/25 border-danger text-[#fff5f5]"
                   : error.severity === "error"
-                  ? "bg-primary/20 border-primary text-primary"
-                  : "bg-secondary/20 border-secondary text-secondary"
+                  ? "bg-black/35 border-primary text-[#fff8ed]"
+                  : "bg-black/35 border-secondary text-[#fffbeb]"
               }`}
             >
-              <span className="font-bold">
+              <span className="font-bold opacity-100">
                 [{error.code}] {error.label}:
               </span>{" "}
               {error.message}
             </div>
             {matchScore !== null && matchScore > 0 && (
-              <p className="text-muted text-xs">
+              <p className="honk-on-surface-subtle text-xs">
                 Acoustic match: {(matchScore * 100).toFixed(1)}% (
                 {(HONK_PASS_THRESHOLD * 100).toFixed(0)}% required)
               </p>
@@ -244,7 +244,7 @@ export default function HonkOtpFlow() {
             <div className="flex gap-3">
               <button
                 onClick={cancelAuth}
-                className="flex-1 py-3 rounded-lg border border-white/20 text-muted hover:bg-white/5 transition-colors"
+                className="flex-1 py-3 rounded-lg border border-white/25 honk-on-surface-muted hover:bg-white/10 transition-colors"
               >
                 Close
               </button>
@@ -270,12 +270,12 @@ function VerifyBar({ label, delay }: { label: string; delay: number }) {
   return (
     <div className="space-y-1">
       <div className="flex justify-between text-xs">
-        <span className="text-muted">{label}</span>
+        <span className="honk-on-surface-muted">{label}</span>
         <span className="text-primary verify-check" style={{ animationDelay: `${delay + 0.5}s` }}>
           ...
         </span>
       </div>
-      <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+      <div className="h-2 bg-white/20 rounded-full overflow-hidden">
         <div
           className="h-full bg-primary rounded-full verify-bar"
           style={{ animationDelay: `${delay}s` }}

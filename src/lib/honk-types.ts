@@ -80,6 +80,18 @@ export type HonkOtpStep =
   | "success"
   | "error";
 
+/** Steps where site video/audio is ducked so honk verification stays clear. */
+export const HONK_VERIFICATION_SITE_MUTE_STEPS: readonly HonkOtpStep[] = [
+  "calling",
+  "playing-seed",
+  "listening",
+  "verifying",
+];
+
+export function isHonkVerificationSiteMuteStep(step: HonkOtpStep): boolean {
+  return HONK_VERIFICATION_SITE_MUTE_STEPS.includes(step);
+}
+
 export interface HonkOtpState {
   step: HonkOtpStep;
   seedHonkParams: SeedHonkParams | null;
