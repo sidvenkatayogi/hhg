@@ -1,0 +1,144 @@
+{
+  "rounds": [
+    {
+      "id": "round_001",
+      "title": "The Sandwich Standoff",
+      "description": "A goose is eyeing a child's sandwich at the park. The tension is palpable. The child is unaware. The goose is not.",
+      "setupVideo": "/videos/round_001_setup.mp4",
+      "revealVideo": "/videos/round_001_reveal.mp4",
+      "options": [
+        { "index": 0, "label": "🥪 Snatch the sandwich" },
+        { "index": 1, "label": "🫡 Walk away peacefully" },
+        { "index": 2, "label": "🗣️ Honk aggressively and assert dominance" },
+        { "index": 3, "label": "🧍 Just stand there. Menacingly." }
+      ],
+      "correctOutcome": 0
+    },
+    {
+      "id": "round_002",
+      "title": "Dog vs. Goose",
+      "description": "A goose and a golden retriever are locked in an epic standoff. Only one will walk away with their dignity intact.",
+      "setupVideo": "/videos/round_002_setup.mp4",
+      "revealVideo": "/videos/round_002_reveal.mp4",
+      "options": [
+        { "index": 0, "label": "🏃 Chase the dog" },
+        { "index": 1, "label": "🐕 Get chased by the dog" },
+        { "index": 2, "label": "🤝 Befriend the dog" },
+        { "index": 3, "label": "😐 Ignore it completely" }
+      ],
+      "correctOutcome": 0
+    },
+    {
+      "id": "round_003",
+      "title": "Shopping Cart Heist",
+      "description": "An unattended shopping cart sits in a parking lot. A goose approaches with intent. This can only end one way.",
+      "setupVideo": "/videos/round_003_setup.mp4",
+      "revealVideo": "/videos/round_003_reveal.mp4",
+      "options": [
+        { "index": 0, "label": "🛒 Steal the cart" },
+        { "index": 1, "label": "💥 Knock it over" },
+        { "index": 2, "label": "🪑 Sit in it triumphantly" },
+        { "index": 3, "label": "💩 Poop on it" }
+      ],
+      "correctOutcome": 2
+    },
+    {
+      "id": "round_004",
+      "title": "The Picnic Raid",
+      "description": "An unattended picnic blanket loaded with food. A goose sizes up the situation. This is a heist movie now.",
+      "setupVideo": "/videos/round_004_setup.mp4",
+      "revealVideo": "/videos/round_004_reveal.mp4",
+      "options": [
+        { "index": 0, "label": "🍕 Eat everything in sight" },
+        { "index": 1, "label": "🧹 Drag the whole blanket away" },
+        { "index": 2, "label": "🛋️ Sit on the blanket like royalty" },
+        { "index": 3, "label": "🐜 Honk at the ants" }
+      ],
+      "correctOutcome": 1
+    },
+    {
+      "id": "round_005",
+      "title": "Golf Course Chaos",
+      "description": "A goose has wandered onto the 18th green. A golf ball sits inches from the hole. The golfer watches in horror.",
+      "setupVideo": "/videos/round_005_setup.mp4",
+      "revealVideo": "/videos/round_005_reveal.mp4",
+      "options": [
+        { "index": 0, "label": "⛳ Steal the golf ball and run" },
+        { "index": 1, "label": "📢 Honk at the golfers" },
+        { "index": 2, "label": "🕳️ Sit in the hole" },
+        { "index": 3, "label": "🏎️ Chase the golf cart" }
+      ],
+      "correctOutcome": 0
+    },
+    {
+      "id": "round_006",
+      "title": "The Sandwich Standoff II",
+      "description": "The goose is back. Another sandwich. Another victim. Will it play out the same way? Place your bets.",
+      "setupVideo": "/videos/round_001_setup.mp4",
+      "revealVideo": "/videos/round_001_reveal.mp4",
+      "options": [
+        { "index": 0, "label": "🥪 Snatch it again, obviously" },
+        { "index": 1, "label": "🫡 Reformed goose walks away" },
+        { "index": 2, "label": "🗣️ Honk so loud the sandwich explodes" },
+        { "index": 3, "label": "🧍 Menacing stare (extended cut)" }
+      ],
+      "correctOutcome": 0
+    },
+    {
+      "id": "round_007",
+      "title": "Dog vs. Goose: The Rematch",
+      "description": "The retriever thought it was safe. It was not. The goose remembers everything.",
+      "setupVideo": "/videos/round_002_setup.mp4",
+      "revealVideo": "/videos/round_002_reveal.mp4",
+      "options": [
+        { "index": 0, "label": "🏃 Chase it into the sunset" },
+        { "index": 1, "label": "🐕 Dog gets revenge this time" },
+        { "index": 2, "label": "🤝 Unlikely alliance forms" },
+        { "index": 3, "label": "😐 Both just stare into the void" }
+      ],
+      "correctOutcome": 0
+    },
+    {
+      "id": "round_008",
+      "title": "Shopping Cart Heist: Part Deux",
+      "description": "Same cart. Same goose. Different day. The parking lot is its kingdom now.",
+      "setupVideo": "/videos/round_003_setup.mp4",
+      "revealVideo": "/videos/round_003_reveal.mp4",
+      "options": [
+        { "index": 0, "label": "🛒 Grand theft cart" },
+        { "index": 1, "label": "💥 Tip it for fun" },
+        { "index": 2, "label": "🪑 Throne reclaimed" },
+        { "index": 3, "label": "💩 Mark its territory" }
+      ],
+      "correctOutcome": 2
+    },
+    {
+      "id": "round_009",
+      "title": "The Picnic Raid: Reloaded",
+      "description": "Fool me once, shame on the goose. Fool me twice... still shame on the goose. Nobody learns.",
+      "setupVideo": "/videos/round_004_setup.mp4",
+      "revealVideo": "/videos/round_004_reveal.mp4",
+      "options": [
+        { "index": 0, "label": "🍕 Devour the entire spread" },
+        { "index": 1, "label": "🧹 Blanket heist 2.0" },
+        { "index": 2, "label": "🛋️ Just vibing on the blanket" },
+        { "index": 3, "label": "🐜 Start a turf war with ants" }
+      ],
+      "correctOutcome": 1
+    },
+    {
+      "id": "round_010",
+      "title": "Golf Course Chaos: Back Nine",
+      "description": "The golfer hired security. It didn't help. The goose plays by its own rules.",
+      "setupVideo": "/videos/round_005_setup.mp4",
+      "revealVideo": "/videos/round_005_reveal.mp4",
+      "options": [
+        { "index": 0, "label": "⛳ Ball thief strikes again" },
+        { "index": 1, "label": "📢 Honk a hole-in-one" },
+        { "index": 2, "label": "🕳️ Claim the 18th hole as a nest" },
+        { "index": 3, "label": "🏎️ Commandeer the golf cart" }
+      ],
+      "correctOutcome": 0
+    }
+  ]
+}
