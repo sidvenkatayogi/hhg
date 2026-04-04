@@ -16,20 +16,6 @@
     },
     {
       "id": "round_002",
-      "title": "Dog vs. Goose",
-      "description": "A goose and a golden retriever are locked in an epic standoff. Only one will walk away with their dignity intact.",
-      "setupVideo": "/videos/round_002_setup.mp4",
-      "revealVideo": "/videos/round_002_reveal.mp4",
-      "options": [
-        { "index": 0, "label": "🏃 Chase the dog" },
-        { "index": 1, "label": "🐕 Get chased by the dog" },
-        { "index": 2, "label": "🤝 Befriend the dog" },
-        { "index": 3, "label": "😐 Ignore it completely" }
-      ],
-      "correctOutcome": 0
-    },
-    {
-      "id": "round_003",
       "title": "Shopping Cart Heist",
       "description": "An unattended shopping cart sits in a parking lot. A goose approaches with intent. This can only end one way.",
       "setupVideo": "/videos/round_003_setup.mp4",
@@ -43,7 +29,7 @@
       "correctOutcome": 2
     },
     {
-      "id": "round_004",
+      "id": "round_003",
       "title": "The Picnic Raid",
       "description": "An unattended picnic blanket loaded with food. A goose sizes up the situation. This is a heist movie now.",
       "setupVideo": "/videos/round_004_setup.mp4",
@@ -57,7 +43,7 @@
       "correctOutcome": 1
     },
     {
-      "id": "round_005",
+      "id": "round_004",
       "title": "Golf Course Chaos",
       "description": "A goose has wandered onto the 18th green. A golf ball sits inches from the hole. The golfer watches in horror.",
       "setupVideo": "/videos/round_005_setup.mp4",
@@ -71,7 +57,7 @@
       "correctOutcome": 0
     },
     {
-      "id": "round_006",
+      "id": "round_005",
       "title": "The Sandwich Standoff II",
       "description": "The goose is back. Another sandwich. Another victim. Will it play out the same way? Place your bets.",
       "setupVideo": "/videos/round_001_setup.mp4",
@@ -85,21 +71,7 @@
       "correctOutcome": 0
     },
     {
-      "id": "round_007",
-      "title": "Dog vs. Goose: The Rematch",
-      "description": "The retriever thought it was safe. It was not. The goose remembers everything.",
-      "setupVideo": "/videos/round_002_setup.mp4",
-      "revealVideo": "/videos/round_002_reveal.mp4",
-      "options": [
-        { "index": 0, "label": "🏃 Chase it into the sunset" },
-        { "index": 1, "label": "🐕 Dog gets revenge this time" },
-        { "index": 2, "label": "🤝 Unlikely alliance forms" },
-        { "index": 3, "label": "😐 Both just stare into the void" }
-      ],
-      "correctOutcome": 0
-    },
-    {
-      "id": "round_008",
+      "id": "round_006",
       "title": "Shopping Cart Heist: Part Deux",
       "description": "Same cart. Same goose. Different day. The parking lot is its kingdom now.",
       "setupVideo": "/videos/round_003_setup.mp4",
@@ -113,7 +85,7 @@
       "correctOutcome": 2
     },
     {
-      "id": "round_009",
+      "id": "round_007",
       "title": "The Picnic Raid: Reloaded",
       "description": "Fool me once, shame on the goose. Fool me twice... still shame on the goose. Nobody learns.",
       "setupVideo": "/videos/round_004_setup.mp4",
@@ -127,7 +99,7 @@
       "correctOutcome": 1
     },
     {
-      "id": "round_010",
+      "id": "round_008",
       "title": "Golf Course Chaos: Back Nine",
       "description": "The golfer hired security. It didn't help. The goose plays by its own rules.",
       "setupVideo": "/videos/round_005_setup.mp4",
