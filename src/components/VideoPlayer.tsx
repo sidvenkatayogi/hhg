@@ -13,6 +13,18 @@ export default function VideoPlayer({ setupSrc, revealSrc, isRevealing }: VideoP
   const revealRef = useRef<HTMLVideoElement>(null);
   const [showReveal, setShowReveal] = useState(false);
   const [setupEnded, setSetupEnded] = useState(false);
+  const [userInteracted, setUserInteracted] = useState(false);
+
+  // Track first user interaction so we can unmute
+  useEffect(() => {
+    const handler = () => setUserInteracted(true);
+    window.addEventListener("click", handler, { once: true });
+    window.addEventListener("keydown", handler, { once: true });
+    return () => {
+      window.removeEventListener("click", handler);
+      window.removeEventListener("keydown", handler);
+    };
+  }, []);
 
   // Reset state when the setup video source changes (new round)
   useEffect(() => {
@@ -20,16 +32,18 @@ export default function VideoPlayer({ setupSrc, revealSrc, isRevealing }: VideoP
     setShowReveal(false);
     const setupEl = setupRef.current;
     if (setupEl) {
+      setupEl.muted = !userInteracted;
       setupEl.currentTime = 0;
       setupEl.play().catch(() => {});
     }
-  }, [setupSrc]);
+  }, [setupSrc, userInteracted]);
 
   useEffect(() => {
     if (isRevealing) {
       setShowReveal(true);
       const revealEl = revealRef.current;
       if (revealEl) {
+        revealEl.muted = false;
         revealEl.currentTime = 0;
         revealEl.play().catch(() => {});
       }
@@ -41,6 +55,7 @@ export default function VideoPlayer({ setupSrc, revealSrc, isRevealing }: VideoP
   const handleReplay = () => {
     const setupEl = setupRef.current;
     if (setupEl) {
+      setupEl.muted = false;
       setupEl.currentTime = 0;
       setupEl.play().catch(() => {});
       setSetupEnded(false);
@@ -65,7 +80,6 @@ export default function VideoPlayer({ setupSrc, revealSrc, isRevealing }: VideoP
       <video
         ref={revealRef}
         src={revealSrc}
-        muted
         playsInline
         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
           showReveal ? "opacity-100" : "opacity-0"
