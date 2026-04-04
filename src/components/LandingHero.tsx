@@ -18,29 +18,25 @@ export default function LandingHero() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative noise-bg">
       {/* Giant goose */}
-      <div className="text-[120px] md:text-[200px] leading-none mb-4 select-none">
-        🪿
+      <div className="leading-none mb-4 select-none">
+        <img src="/harnold_.png" style={{height: '200px', display: 'block', margin: '0 auto', transform: 'translateX(40px)'}} alt="Harnold" />
       </div>
 
       {/* Title */}
-      <h1 className="text-5xl md:text-8xl font-display text-primary glow-orange inline-block px-4 py-2">
+      <h1 className="text-5xl md:text-8xl font-display glow-orange inline-block px-4 py-2" style={{color: 'rgb(56, 34, 16)'}}>
         GOOSE BETS
       </h1>
-
-      {/* Subtitle */}
-      <p className="text-muted text-lg md:text-xl mt-4 italic">
-        &quot;The future of degenerate waterfowl gambling&quot;
-      </p>
 
       {/* CTA */}
       <div className="mt-10">
         <WalletMultiButton
           style={{
-            background: "#FF6B00",
+            background: "rgb(56, 34, 16)",
+            color: "white",
             fontSize: "1.1rem",
             padding: "16px 32px",
             borderRadius: "12px",
-            fontFamily: "'Luckiest Guy', cursive",
+            fontFamily: "'PlotterxsTRIAL', sans-serif",
             letterSpacing: "1px",
           }}
         />
@@ -54,8 +50,8 @@ export default function LandingHero() {
       <div className="absolute bottom-0 left-0 right-0 bg-surface/80 border-t border-white/10 py-2 overflow-hidden">
         <div className="flex animate-marquee whitespace-nowrap">
           {[1, 2].map((k) => (
-            <span key={k} className="text-sm text-muted mx-4">
-              🪿 HONK HONK HONK — Total Volume Honked: 420.69 SOL — Active
+            <span key={k} className="text-sm text-muted mx-4 inline-flex items-center gap-2">
+              <img src="/harnold_.png" style={{height: '16px', display: 'inline'}} alt="" /> HONK HONK HONK — Total Volume Honked: 420.69 SOL — Active
               Degens: 69 — Geese Wronged: 0 — HONK HONK HONK —{" "}
             </span>
           ))}

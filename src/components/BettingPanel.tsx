@@ -173,9 +173,9 @@ export default function BettingPanel({
               />
 
               <div className="relative z-10">
-                <div className="text-sm md:text-base font-bold mb-2">{opt.label}</div>
+                <div className="text-sm md:text-base font-bold mb-2 text-white">{opt.label.replace(/^\S+\s/, '')}</div>
                 <div className="flex items-center justify-between gap-2">
-                  <div className="text-xs text-muted">
+                  <div className="text-xs text-white/80">
                     {betTotals[opt.index]?.toFixed(2) || "0.00"} SOL
                   </div>
                   <div className="flex items-center gap-2">
@@ -213,7 +213,8 @@ export default function BettingPanel({
               step="0.01"
               value={wager}
               onChange={(e) => setWager(e.target.value)}
-              className="w-full bg-surface border border-white/10 rounded-lg px-4 py-3 text-foreground focus:border-primary focus:outline-none"
+              className="w-full rounded-lg px-4 py-3 text-white focus:outline-none"
+              style={{ background: 'rgba(56,34,16,0.45)', border: '1px solid rgba(56,34,16,0.6)' }}
               placeholder="0.1"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted text-sm">
@@ -223,16 +224,17 @@ export default function BettingPanel({
           <button
             onClick={handlePlaceBet}
             disabled={!publicKey || selectedOption === null || placing}
-            className="bg-primary text-white font-bold px-6 py-3 rounded-lg hover:bg-primary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed animate-pulse-glow"
+            className="font-bold px-6 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed animate-pulse-glow"
+            style={{background: 'rgb(228, 171, 85)', color: 'rgb(56, 34, 16)'}}
           >
-            {placing ? "HONKING..." : "PLACE BET 🪿"}
+            {placing ? "HONKING..." : "PLACE BET"}
           </button>
         </div>
       )}
 
       {hasBet && (
         <div className="text-center py-2 text-success font-bold text-lg">
-          HONK! Your bet is locked in. 🪿
+          HONK! Your bet is locked in.
         </div>
       )}
 

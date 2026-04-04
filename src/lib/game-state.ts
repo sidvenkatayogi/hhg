@@ -14,9 +14,9 @@ export interface GameState {
 }
 
 // ── Timing constants ──
-const BETTING_DURATION_S = 60;
-const REVEAL_DURATION_S = 15;
-const ROUND_DURATION_S = BETTING_DURATION_S + REVEAL_DURATION_S; // 75s per round
+const BETTING_DURATION_S = 15;
+const REVEAL_DURATION_S = 10;
+const ROUND_DURATION_S = BETTING_DURATION_S + REVEAL_DURATION_S; // 25s per round
 
 // Fixed epoch — all instances agree on when "round 0" started.
 // Set to a recent past time so rounds are already cycling.
@@ -61,7 +61,7 @@ function generateMockBets(
 
   // Each bot "arrives" at a deterministic time in the betting window
   for (let i = 0; i < MOCK_WALLETS.length; i++) {
-    const arriveAt = 3 + rng() * (BETTING_DURATION_S - 5); // arrive between 3s and 55s
+    const arriveAt = 1 + rng() * (BETTING_DURATION_S - 2); // arrive between 1s and 13s
     if (elapsedS < arriveAt) continue; // hasn't arrived yet
 
     // Pick option — 40% correct, 60% random

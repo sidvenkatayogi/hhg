@@ -68,7 +68,7 @@ export default function BetFeed({ betTotals, totalPot, options, status }: BetFee
 
   return (
     <div className="bg-surface rounded-xl border border-white/10 p-4">
-      <h3 className="text-xs font-bold text-muted uppercase tracking-wider mb-3">
+      <h3 className="text-xs font-bold text-white/60 uppercase tracking-wider mb-3">
         Live Bets 🔴
       </h3>
       <div className="space-y-1.5 max-h-[200px] overflow-hidden">
@@ -76,7 +76,7 @@ export default function BetFeed({ betTotals, totalPot, options, status }: BetFee
           <div
             key={item.id}
             className={`flex items-center justify-between text-xs py-1 px-2 rounded transition-all ${
-              i === 0 ? "bg-primary/10 text-foreground" : "text-muted"
+              i === 0 ? "bg-primary/10 text-white" : "text-white/70"
             }`}
             style={{ opacity: 1 - i * 0.1 }}
           >
@@ -86,7 +86,7 @@ export default function BetFeed({ betTotals, totalPot, options, status }: BetFee
                 {truncateAddress(item.wallet + "1111111111111111111111111111")}
               </span>
               <span className="text-white/40">bet on</span>
-              <span className="font-bold text-foreground truncate max-w-[100px]">
+              <span className="font-bold text-white truncate max-w-[100px]">
                 {item.option}
               </span>
             </div>

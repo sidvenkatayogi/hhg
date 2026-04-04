@@ -42,18 +42,19 @@ export default function Leaderboard() {
           <div
             key={entry.pubkey}
             className={`flex items-center justify-between py-2 px-3 rounded-lg ${
-              i === 0 ? "bg-secondary/10 border border-secondary/30" : "bg-white/5"
+              i === 0 ? "bg-secondary/10 border border-secondary/30" : ""
             }`}
+            style={i !== 0 ? { background: 'rgba(56, 34, 16, 0.35)' } : {}}
           >
             <div className="flex items-center gap-2">
-              <span className="w-6 text-center">
+              <span className="w-6 text-center text-white">
                 {i < 3 ? medals[i] : `${i + 1}.`}
               </span>
-              <span className="text-sm font-mono">
+              <span className="text-sm font-mono text-white">
                 {truncateAddress(entry.pubkey)}
               </span>
             </div>
-            <span className={`font-bold text-sm ${i === 0 ? "text-secondary" : "text-foreground"}`}>
+            <span className="font-bold text-sm text-secondary">
               {entry.totalWon.toFixed(2)} SOL
             </span>
           </div>
